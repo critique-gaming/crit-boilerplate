@@ -12,7 +12,7 @@ high_dpi = 1
 
 [project]
 title = crit-boilerplate
-custom_resources = config/env.lua
+custom_resources = env.lua
 dependencies = https://github.com/subsoap/defos/archive/master.zip
 
 [render]
