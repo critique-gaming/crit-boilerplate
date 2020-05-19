@@ -1,2 +1,62 @@
+math.randomseed(os.time())
+-- Darwin's implementation of rand() seems to have a bias in the first values
+for i = 1, 8 do
+  math.random()
+end
+
+local env = require "crit.env"
+local save_file = require "lib.save_file"
+local Layout = require "crit.layout"
+local dispatcher = require "crit.dispatcher"
+local intl = require "crit.intl"
+local sys_config = require "crit.sys_config"
+
 function init(self)
+  intl.init({
+    language = env.language, -- Defaults to system language
+    warn_fallback = sys_config.debug,
+  })
+
+  -- Prevent auto-sleep in debug mode on mobile
+  if sys_config.debug then
+    window.set_dim_mode(window.DIMMING_OFF)
+  end
+
+  -- Set screen resolution
+  if defos then
+    local full_screen_setting
+    if env.full_screen == nil then
+      full_screen_setting = save_file.config.full_screen
+    else
+      full_screen_setting = env.full_screen
+    end
+    defos.set_fullscreen(full_screen_setting)
+
+    if not full_screen_setting and (env.window_width or env.window_height) then
+      local aspect = Layout.design_width / Layout.design_height
+      local width = env.window_width or (env.window_height * aspect)
+      local height = env.window_height or (env.window_width / aspect)
+      local x, y = nil, nil
+
+      if env.display then
+        local display = defos.get_displays()[env.display]
+        if display then
+          x = display.bounds.x + (display.bounds.width - width) * 0.5
+          y = display.bounds.y + (display.bounds.height - height) * 0.5
+        end
+      end
+
+      defos.set_view_size(x, y, width, height)
+    end
+  end
+end
+
+function final(self)
+  dispatcher.unsubscribe(self.sub_id)
+end
+
+function update(self, dt)
+  if defos then
+    save_file.set_config("full_screen", defos.is_fullscreen())
+  end
 end
