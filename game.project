@@ -1,0 +1,44 @@
+[bootstrap]
+main_collection = /main/main.collectionc
+render = /main/render/custom.renderc
+
+[script]
+shared_state = 1
+
+[display]
+width = 1920
+height = 1080
+high_dpi = 1
+
+[project]
+title = crit-boilerplate
+custom_resources = config/env.lua
+dependencies = https://github.com/subsoap/defos/archive/master.zip
+
+[render]
+clear_color_red = 0.0
+
+[sprite]
+max_count = 1024
+
+[label]
+max_count = 1024
+
+[graphics]
+max_debug_vertices = 50000
+
+[tilemap]
+max_count = 512
+max_tile_count = 16384
+
+[physics]
+max_collisions = 256
+
+[particle_fx]
+max_count = 512
+max_particle_count = 4096
+
+[input]
+use_accelerometer = 0
+game_binding = /crit/all.input_bindingc
+

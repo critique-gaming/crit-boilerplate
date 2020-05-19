@@ -1,0 +1,79 @@
+local analog_to_digital = require "crit.analog_to_digital"
+local input_method_switcher = require "main.input.input_method_switcher"
+local held_keys = require "lib.held_keys"
+local sys_config = require "crit.sys_config"
+
+local h_key_lalt = hash("key_lalt")
+local h_key_ralt = hash("key_ralt")
+local h_key_lctrl = hash("key_lctrl")
+local h_key_rctrl = hash("key_rctrl")
+local h_key_lshift = hash("key_lshift")
+local h_key_rshift = hash("key_rshift")
+local h_key_lsuper = hash("key_lsuper")
+local h_key_rsuper = hash("key_rsuper")
+
+local h_key_f4 = hash("key_f4")
+local h_key_p = hash("key_p")
+local h_key_backquote = hash("key_backquote")
+local h_key_enter = hash("key_enter")
+
+local h_acquire_input_focus = hash("acquire_input_focus")
+
+function init(self)
+  msg.post(".", h_acquire_input_focus)
+end
+
+local function update_modifiers()
+  held_keys.alt = held_keys[h_key_lalt] or held_keys[h_key_ralt] or false
+  held_keys.shift = held_keys[h_key_lshift] or held_keys[h_key_rshift] or false
+  held_keys.ctrl = held_keys[h_key_lctrl] or held_keys[h_key_rctrl] or false
+  held_keys.super = held_keys[h_key_lsuper] or held_keys[h_key_rsuper] or false
+end
+
+local wrapped_on_input = analog_to_digital.wrap_on_input(function (self, action_id, action)
+  if action.pressed then
+    held_keys[action_id] = true
+    update_modifiers()
+  elseif action.released then
+    held_keys[action_id] = nil
+    update_modifiers()
+  end
+
+  if action_id == h_key_f4 and action.pressed and held_keys.alt then
+    if sys_config.system_name == "Windows" or sys_config.system_name == "Linux" then
+      sys.exit(0)
+      return true
+    end
+
+  elseif action_id == h_key_enter then
+    if action.pressed and held_keys.alt and defos then
+      defos.toggle_fullscreen()
+      return true
+    end
+
+  elseif sys_config.debug then
+    if action_id == h_key_backquote then
+      if action.pressed and held_keys.ctrl then
+        msg.post("@system:", "toggle_profile")
+        return true
+      end
+
+    elseif action_id == h_key_p then
+      if action.pressed and held_keys.ctrl then
+        msg.post("@system:", "toggle_physics_debug")
+        return true
+      end
+    end
+  end
+end)
+
+function on_input(self, action_id, action)
+  analog_to_digital.on_input(action_id, action)
+  input_method_switcher(action_id, action)
+
+  return wrapped_on_input(self, action_id, action)
+end
+
+function update(self,dt)
+  analog_to_digital.update()
+end
