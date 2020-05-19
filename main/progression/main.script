@@ -1,0 +1,45 @@
+local progression = require "crit.progression"
+local env = require "crit.env"
+-- local scenes = require "main.progression.scenes"
+
+local game = require "main.progression.game"
+
+local h_run_progression = hash("run_progression")
+
+local progressions = {
+  main = function ()
+    if env.entry_scene then
+      -- scenes.load_scene(env.entry_scene.scene, env.entry_scene.options)
+      -- scenes.wait_for_end_scene()
+    end
+    game()
+  end,
+}
+
+local function run_progression(progression_id, ...)
+  -- The first argument is normally a progression id, but also accept
+  -- a function which could come from env.entry_progression
+  local coroutine_function
+  if type(progression_id) == 'function' then
+    coroutine_function = progression_id
+  else
+    coroutine_function = progressions[progression_id]
+  end
+
+  if not coroutine_function then
+    print("ERROR: There is no progression with id \"" .. progression_id .. "\"")
+    return
+  end
+  return progression.detach(coroutine_function, ...)
+end
+
+local function entry_point()
+  local co = run_progression(env.entry_progression or "main", env.entry_progression_arg)
+  while true do
+    local message = progression.wait_for_message(h_run_progression)
+    progression.cancel(co)
+    co = run_progression(message.id, message.options)
+  end
+end
+
+progression.init_register_function(entry_point)
