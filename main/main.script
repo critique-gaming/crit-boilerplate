@@ -32,7 +32,7 @@ function init(self)
     end
     defos.set_fullscreen(full_screen_setting)
 
-    if not full_screen_setting and (env.window_width or env.window_height) then
+    if not full_screen_setting and (sys_config.debug and env.window_width or env.window_height) then
       local aspect = Layout.design_width / Layout.design_height
       local width = env.window_width or (env.window_height * aspect)
       local height = env.window_height or (env.window_width / aspect)
