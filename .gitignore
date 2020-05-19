@@ -1,4 +1,4 @@
-/config/env.lua
+/env.lua
 .externalToolBuilders
 .DS_Store
 .lock-wscript
