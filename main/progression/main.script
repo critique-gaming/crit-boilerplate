@@ -1,6 +1,6 @@
 local progression = require "crit.progression"
 local env = require "crit.env"
--- local scenes = require "main.progression.scenes"
+local monarch = require "monarch.monarch"
 
 local game = require "main.progression.game"
 
@@ -9,9 +9,10 @@ local h_run_progression = hash("run_progression")
 local progressions = {
   main = function ()
     if env.entry_scene then
-      -- scenes.load_scene(env.entry_scene.scene, env.entry_scene.options)
-      -- scenes.wait_for_end_scene()
+      monarch.show(env.entry_scene.scene, nil, env.entry_scene.data)
+      return
     end
+
     game()
   end,
 }

@@ -1,0 +1,58 @@
+local dispatcher = require "crit.dispatcher"
+local Layout = require "crit.layout"
+local transitions = require "monarch.transitions.gui"
+
+local h_window_change_size = hash("window_change_size")
+
+local function fade_out(node, from, easing, duration, delay, cb)
+  local to = gui.get_color(node)
+  to.w = 1
+  gui.set_color(node, to)
+  gui.set_enabled(node, true)
+  to.w = 0
+  gui.animate(node, gui.PROP_COLOR, to, easing, duration, delay, function (self)
+    cb(self)
+    gui.set_enabled(node, false)
+  end)
+end
+
+local function fade_in(node, from, easing, duration, delay, cb)
+  local to = gui.get_color(node)
+  to.w = 0
+  gui.set_color(node, to)
+  gui.set_enabled(node, true)
+  to.w = 1
+  gui.animate(node, gui.PROP_COLOR, to, easing, duration, delay, function (self)
+    cb(self)
+    gui.set_enabled(node, false)
+  end)
+end
+
+local function on_window_change_size(self)
+  transitions.window_resized(Layout.viewport_width, Layout.viewport_height);
+  gui.set_size(self.root, vmath.vector3(Layout.viewport_width, Layout.viewport_height, 0))
+end
+
+function init(self)
+  self.root = gui.get_node("root")
+  gui.set_enabled(self.root, false)
+  gui.set_render_order(15)
+
+  self.transition = transitions.create(self.root)
+    .show_in(fade_out, gui.EASING_LINEAR, 0.5, 0)
+    .show_out(fade_in, gui.EASING_LINEAR, 0.5, 0)
+    .back_in(fade_out, gui.EASING_LINEAR, 0.5, 0)
+    .back_out(fade_in, gui.EASING_LINEAR, 0.5, 0)
+
+  on_window_change_size(self)
+
+  self.sub_id = dispatcher.subscribe({ h_window_change_size })
+end
+
+function on_message(self, message_id, message, sender)
+  self.transition.handle(message_id, message, sender)
+
+  if message_id == h_window_change_size then
+    on_window_change_size(self)
+  end
+end

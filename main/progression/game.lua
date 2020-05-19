@@ -1,5 +1,7 @@
+local monarch = require "monarch.monarch"
+
 local function game()
-  print("The game's main progression starts here")
+  monarch.show("game")
 end
 
 return game
