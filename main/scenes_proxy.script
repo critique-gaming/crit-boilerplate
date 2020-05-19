@@ -6,12 +6,16 @@ local h_proxy_loaded = hash("proxy_loaded")
 local h_init = hash("init")
 local h_enable = hash("enable")
 local h_load = hash("load")
+local h_acquire_input_focus = hash("acquire_input_focus")
 
 function init(self)
-  self.proxy_url = msg.url("#progression")
+  self.proxy_url = msg.url("#scenes")
   self.sub_id = dispatcher.subscribe({ h_scene_set_time_step })
 
   msg.post(self.proxy_url, h_load)
+
+  msg.post(".", h_acquire_input_focus)
+  msg.post("global_bindings", h_acquire_input_focus)
 end
 
 function final(self)
