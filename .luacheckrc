@@ -48,4 +48,5 @@ globals = {
   "defos",
   "discordrich",
   "timer",
+  "window",
 }
