@@ -9,7 +9,7 @@ local h_run_progression = hash("run_progression")
 local progressions = {
   main = function ()
     if env.entry_scene then
-      monarch.show(env.entry_scene.scene, nil, env.entry_scene.data)
+      monarch.show(env.entry_scene, nil, env.entry_scene_data)
       return
     end
 
