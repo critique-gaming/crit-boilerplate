@@ -76,7 +76,7 @@ embedded_instances {
   "  }\n"
   "  properties {\n"
   "    id: \"transition_url\"\n"
-  "    value: \"/scene_transitions#fade\"\n"
+  "    value: \"/screen_transitions#fade\"\n"
   "    type: PROPERTY_TYPE_URL\n"
   "  }\n"
   "}\n"
@@ -117,10 +117,10 @@ embedded_instances {
   }
 }
 embedded_instances {
-  id: "scene_transitions"
+  id: "screen_transitions"
   data: "components {\n"
   "  id: \"fade\"\n"
-  "  component: \"/main/scene_transitions/fade.gui\"\n"
+  "  component: \"/main/screen_transitions/fade.gui\"\n"
   "  position {\n"
   "    x: 0.0\n"
   "    y: 0.0\n"
