@@ -1,0 +1,14 @@
+local monarch = require "monarch.monarch"
+local dispatcher = require "crit.dispatcher"
+
+function init(self)
+  monarch.add_listener()
+end
+
+function final(self)
+  monarch.remove_listener()
+end
+
+function on_message(self, message_id, message, sender)
+  dispatcher.dispatch(message_id, message)
+end

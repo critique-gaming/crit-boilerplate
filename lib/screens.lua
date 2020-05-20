@@ -3,38 +3,41 @@ local monarch = require "monarch.monarch"
 
 local M = {}
 
-function M.replace(screen_id, data, options)
-  options = options or {}
-  if options.sequential == nil then
-    options.sequential = true
-  end
-
-  local co = coroutine.running()
-  monarch.replace(screen_id, options, data, function ()
-    if co then progression.resume(co) end
-  end)
-  coroutine.yield(function () co = nil end)
-end
-
 function M.show(screen_id, data, options)
   options = options or {}
   if options.sequential == nil then
     options.sequential = true
   end
 
-  local co = coroutine.running()
-  monarch.show(screen_id, options, data, function ()
-    if co then progression.resume(co) end
+  screen_id = hash(screen_id)
+
+  local fork = progression.fork(function ()
+    progression.wait_for_message(monarch.SCREEN_TRANSITION_IN_STARTED, function (_, message)
+      print(message)
+      return message.screen == screen_id
+    end)
   end)
-  coroutine.yield(function () co = nil end)
+
+  local callback, wait_for_callback = progression.make_callback()
+
+  monarch.show(screen_id, options, data, callback)
+  progression.join(fork)
+
+  return wait_for_callback
+end
+
+function M.replace(screen_id, data, options)
+  options = options or {}
+  if options.pop == nil then
+    options.pop = 1
+  end
+  return M.show(screen_id, data, options)
 end
 
 function M.back(data)
-  local co = coroutine.running()
-  monarch.back(data, function ()
-    if co then progression.resume(co) end
-  end)
-  coroutine.yield(function () co = nil end)
+  local callback, wait_for_callback = progression.make_callback()
+  monarch.back(data, callback)
+  return wait_for_callback
 end
 
 return M
