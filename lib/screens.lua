@@ -5,7 +5,9 @@ local M = {}
 
 function M.replace(screen_id, data, options)
   options = options or {}
-  options.sequential = true
+  if options.sequential == nil then
+    options.sequential = true
+  end
 
   local co = coroutine.running()
   monarch.replace(screen_id, options, data, function ()
@@ -16,7 +18,9 @@ end
 
 function M.show(screen_id, data, options)
   options = options or {}
-  options.sequential = true
+  if options.sequential == nil then
+    options.sequential = true
+  end
 
   local co = coroutine.running()
   monarch.show(screen_id, options, data, function ()
