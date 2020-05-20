@@ -4,6 +4,9 @@ local monarch = require "monarch.monarch"
 local M = {}
 
 function M.replace(screen_id, data, options)
+  options = options or {}
+  options.sequential = true
+
   local co = coroutine.running()
   monarch.replace(screen_id, options, data, function ()
     if co then progression.resume(co) end
@@ -12,6 +15,9 @@ function M.replace(screen_id, data, options)
 end
 
 function M.show(screen_id, data, options)
+  options = options or {}
+  options.sequential = true
+
   local co = coroutine.running()
   monarch.show(screen_id, options, data, function ()
     if co then progression.resume(co) end

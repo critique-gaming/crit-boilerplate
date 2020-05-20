@@ -13,7 +13,7 @@ high_dpi = 1
 [project]
 title = crit-boilerplate
 custom_resources = env.lua,intl/
-dependencies = https://github.com/subsoap/defos/archive/v2.4.0.zip,https://github.com/dapetcu21/monarch/archive/replace.zip
+dependencies = https://github.com/subsoap/defos/archive/v2.4.0.zip,https://github.com/dapetcu21/monarch/archive/master.zip
 
 [render]
 clear_color_red = 0.0
