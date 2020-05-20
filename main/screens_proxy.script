@@ -9,7 +9,7 @@ local h_load = hash("load")
 local h_acquire_input_focus = hash("acquire_input_focus")
 
 function init(self)
-  self.proxy_url = msg.url("#scenes")
+  self.proxy_url = msg.url("#screens")
   self.sub_id = dispatcher.subscribe({ h_scene_set_time_step })
 
   msg.post(self.proxy_url, h_load)

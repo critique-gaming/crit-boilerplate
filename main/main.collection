@@ -36,10 +36,10 @@ embedded_instances {
   }
 }
 embedded_instances {
-  id: "scenes"
+  id: "screens"
   data: "components {\n"
-  "  id: \"scenes_proxy\"\n"
-  "  component: \"/main/screen_proxy.script\"\n"
+  "  id: \"screens_proxy\"\n"
+  "  component: \"/main/screens_proxy.script\"\n"
   "  position {\n"
   "    x: 0.0\n"
   "    y: 0.0\n"
@@ -53,9 +53,9 @@ embedded_instances {
   "  }\n"
   "}\n"
   "embedded_components {\n"
-  "  id: \"scenes\"\n"
+  "  id: \"screens\"\n"
   "  type: \"collectionproxy\"\n"
-  "  data: \"collection: \\\"/main/screen.collection\\\"\\n"
+  "  data: \"collection: \\\"/main/screens.collection\\\"\\n"
   "exclude: false\\n"
   "\"\n"
   "  position {\n"
