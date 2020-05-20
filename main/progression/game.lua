@@ -1,7 +1,8 @@
-local monarch = require "monarch.monarch"
+local screens = require "lib.screens"
 
 local function game()
-  monarch.show("game")
+  screens.replace("game")
+  print("Screen transition finished")
 end
 
 return game
