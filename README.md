@@ -14,6 +14,11 @@ Ready-to-use starter project based on [Crit](https://github.com/dapetcu21/crit),
 * Common global keybindings already set-up
 * Quickly check which keys are being held down with the `held_keys` table
 * Save profile management
+* Testing and code coverage with [DefTest], [TravisCI] and codecov
+
+[DefTest]: https://github.com/britzl/deftest
+[TravisCI]: https://travis-ci.org
+[CodeCov]: https://codecov.io
 
 ## Global key bindings
 
