@@ -1,6 +1,10 @@
 # Critique Gaming's boilerplate project
 
-Ready-to-use starter project based on [Crit](https://github.com/dapetcu21/crit), [Monarch](https://github.com/britzl/monarch) and [DefOS](https://github.com/subsoap/defos)
+Ready-to-use starter project based on [Crit], [Monarch] and [DefOS].
+
+[Crit]: https://github.com/dapetcu21/crit
+[Monarch]: https://github.com/britzl/monarch
+[DefOS]: https://github.com/subsoap/defos
 
 ## Features
 
