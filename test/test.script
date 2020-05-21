@@ -1,7 +1,11 @@
+local env = require "crit.env"
 local deftest = require "deftest.deftest"
 local dummy_tests = require "test.dummy_tests"
 
 function init(self)
   deftest.add(dummy_tests)
-  deftest.run()
+  deftest.run({
+    coverage = { enabled = true },
+    pattern = env.test_pattern or "",
+  })
 end
