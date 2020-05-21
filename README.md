@@ -21,7 +21,7 @@ Ready-to-use starter project based on [Crit], [Monarch] and [DefOS].
 * Testing and code coverage with [DefTest], [TravisCI] and codecov
 
 [DefTest]: https://github.com/britzl/deftest
-[TravisCI]: https://travis-ci.org
+[TravisCI]: https://travis-ci.com
 [CodeCov]: https://codecov.io
 
 ## Global key bindings
