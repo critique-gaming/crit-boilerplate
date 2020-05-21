@@ -15,29 +15,6 @@ title = crit-boilerplate
 custom_resources = env.lua,intl/
 dependencies = https://github.com/britzl/deftest/archive/2.7.1.zip,https://github.com/subsoap/defos/archive/v2.4.0.zip,https://github.com/britzl/monarch/archive/3.2.0.zip
 
-[render]
-clear_color_red = 0.0
-
-[sprite]
-max_count = 1024
-
-[label]
-max_count = 1024
-
-[graphics]
-max_debug_vertices = 50000
-
-[tilemap]
-max_count = 512
-max_tile_count = 16384
-
-[physics]
-max_collisions = 256
-
-[particle_fx]
-max_count = 512
-max_particle_count = 4096
-
 [input]
 use_accelerometer = 0
 game_binding = /crit/all.input_bindingc
