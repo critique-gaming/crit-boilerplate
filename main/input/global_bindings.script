@@ -14,7 +14,7 @@ local h_key_rsuper = hash("key_rsuper")
 
 local h_key_f4 = hash("key_f4")
 local h_key_p = hash("key_p")
-local h_key_backquote = hash("key_backquote")
+local h_key_grave = hash("key_grave")
 local h_key_enter = hash("key_enter")
 
 local h_acquire_input_focus = hash("acquire_input_focus")
@@ -52,7 +52,7 @@ local wrapped_on_input = analog_to_digital.wrap_on_input(function (self, action_
     end
 
   elseif sys_config.debug then
-    if action_id == h_key_backquote then
+    if action_id == h_key_grave then
       if action.pressed and held_keys.ctrl then
         msg.post("@system:", "toggle_profile")
         return true
