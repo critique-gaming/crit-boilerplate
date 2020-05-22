@@ -33,6 +33,8 @@ Ready-to-use starter project based on [Crit], [Monarch] and [DefOS].
 
 ## Useful [`env.lua`](https://github.com/dapetcu21/crit/blob/master/docs/env.md) variables
 
+Create a `.env/env.lua` file that returns a Lua table with development flags for the game.
+
 |Var name|Type|Usage|
 |-|-|-|
 |`window_width`|`number`|On start-up, resize the window to this width.&ast;|

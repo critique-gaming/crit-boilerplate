@@ -26,8 +26,6 @@ chmod +x dmengine_headless
 echo "Downloading ${BOB_URL}"
 curl -o bob.jar ${BOB_URL}
 
-echo "return {}" > env.lua
-
 # Fetch libraries
 echo "Running bob.jar - resolving dependencies"
 java -jar bob.jar --auth "foobar" --email "john@doe.com" resolve
