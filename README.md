@@ -18,11 +18,11 @@ Ready-to-use starter project based on [Crit], [Monarch] and [DefOS].
 * Common global keybindings already set-up
 * Quickly check which keys are being held down with the `held_keys` table
 * Save profile management
-* Testing and code coverage with [DefTest], [TravisCI] and codecov
+* Testing and code coverage with [DefTest], [TravisCI] and [Codecov]
 
 [DefTest]: https://github.com/britzl/deftest
 [TravisCI]: https://travis-ci.com
-[CodeCov]: https://codecov.io
+[Codecov]: https://codecov.io
 
 ## Global key bindings
 
