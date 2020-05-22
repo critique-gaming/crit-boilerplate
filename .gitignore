@@ -1,4 +1,4 @@
-/.env/env.lua
+/_env/env.lua
 /env.lua
 .externalToolBuilders
 .DS_Store
