@@ -26,6 +26,7 @@ globals = {
         "socket",
         "sound",
         "spine",
+        "sprite",
         "sys",
         "tilemap",
         "timer",
@@ -43,5 +44,6 @@ globals = {
         "on_input",
         "update",
 
-        "defos"
+        "defos",
+        "fmod",
 }

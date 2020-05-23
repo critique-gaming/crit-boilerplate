@@ -34,6 +34,7 @@
         "socket",
         "sound",
         "spine",
+        "sprite",
         "sys",
         "tilemap",
         "timer",
@@ -48,7 +49,8 @@
         "on_message",
         "on_input",
         "update",
-        "defos"
+        "defos",
+        "fmod"
     ],
     "Lua.runtime.version": "LuaJIT"
 }
