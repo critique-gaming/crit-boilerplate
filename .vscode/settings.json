@@ -2,7 +2,9 @@
     "files.associations": {
         "*.script": "lua",
         "*.gui_script": "lua",
-        "*.render_script": "lua"
+        "*.render_script": "lua",
+        "*.fp": "glsl",
+        "*.vp": "glsl"
     },
     "glsllint.additionalStageAssociations": {
         ".fp": "frag",
