@@ -3,6 +3,7 @@
         "*.script": "lua",
         "*.gui_script": "lua",
         "*.render_script": "lua",
+        "*.editor_script": "lua",
         "*.fp": "glsl",
         "*.vp": "glsl"
     },
