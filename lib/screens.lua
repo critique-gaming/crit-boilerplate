@@ -13,12 +13,12 @@ function M.show(screen_id, data, options)
 
   local fork = progression.fork(function ()
     progression.wait_for_message(monarch.SCREEN_TRANSITION_IN_STARTED, function (_, message)
-      print(message)
       return message.screen == screen_id
     end)
   end)
 
   local callback, wait_for_callback = progression.make_callback()
+  callback = progression.with_context(callback)
 
   monarch.show(screen_id, options, data, callback)
   progression.join(fork)
@@ -36,6 +36,7 @@ end
 
 function M.back(data)
   local callback, wait_for_callback = progression.make_callback()
+  callback = progression.with_context(callback)
   monarch.back(data, callback)
   return wait_for_callback
 end
