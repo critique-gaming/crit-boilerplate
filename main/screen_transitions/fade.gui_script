@@ -29,7 +29,6 @@ local function fade_in(node, from, easing, duration, delay, cb)
 end
 
 local function on_window_change_size(self)
-  transitions.window_resized(Layout.viewport_width, Layout.viewport_height);
   gui.set_size(self.root, vmath.vector3(Layout.viewport_width, Layout.viewport_height, 0))
 end
 

@@ -1,6 +1,7 @@
 local Layout = require "crit.layout"
 local Button = require "crit.button"
 local dispatcher = require "crit.dispatcher"
+local transitions = require "monarch.transitions.gui"
 
 Layout.default_scale_by = "x"
 
@@ -24,6 +25,8 @@ local function configure_layout(self)
     projection_right = design_width,
     projection_top = design_height,
   })
+
+  transitions.window_resized(Layout.viewport_width, Layout.viewport_height);
 end
 
 function init(self)
