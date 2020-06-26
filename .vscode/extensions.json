@@ -2,6 +2,7 @@
     "recommendations": [
         "sumneko.lua",
         "thesofakillers.vscode-pbtxt",
-        "slevesque.shader"
+        "slevesque.shader",
+        "naumovs.color-highlight"
     ]
 }
