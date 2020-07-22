@@ -1,7 +1,7 @@
 project = 'Crit Boilerplate'
 package = 'crit'
 title = 'Crit Boilerplace Reference'
-file = { '.', exclude = { 'build', 'dist', '.internal' } }
+file = '.'
 format = 'discount'
 style='docs'
 readme = 'README.md'
