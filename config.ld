@@ -1,10 +1,9 @@
 project = 'Crit Boilerplate'
-package = 'crit'
 title = 'Crit Boilerplace Reference'
-file = { 'lib', 'crit', 'game', 'main' }
 format = 'discount'
 style='docs'
 readme = 'README.md'
+file = {'./crit', './lib', './game', './main'}
 
 add_language_extension('.script', 'lua')
 add_language_extension('.gui_script', 'lua')
