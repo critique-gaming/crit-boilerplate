@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Crit Boilerplace Reference</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Crit Boilerplate</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Features">Features </a></li>
+<li><a href="#Global_key_bindings">Global key bindings </a></li>
+<li><a href="#Useful___env_lua___https___critique_gaming_github_io_crit_modules_crit_env_html__variables">Useful [`env.lua`](https://critique-gaming.github.io/crit/modules/crit.env.html) variables </a></li>
+</ul>
+
+
+<h2>Topics</h2>
+<ul class="">
+  <li><strong>README</strong></li>
+</ul>
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/crit.analog_to_digital.html">crit.analog_to_digital</a></li>
+  <li><a href="../modules/crit.button.html">crit.button</a></li>
+  <li><a href="../modules/crit.colors.html">crit.colors</a></li>
+  <li><a href="../modules/crit.context.html">crit.context</a></li>
+  <li><a href="../modules/crit.cursor.html">crit.cursor</a></li>
+  <li><a href="../modules/crit.dispatcher.html">crit.dispatcher</a></li>
+  <li><a href="../modules/crit.drag_and_drop.html">crit.drag_and_drop</a></li>
+  <li><a href="../modules/crit.env.html">crit.env</a></li>
+  <li><a href="../modules/filters.html">filters</a></li>
+  <li><a href="../modules/crit.focus_giver.html">crit.focus_giver</a></li>
+  <li><a href="../modules/crit.func_util.html">crit.func_util</a></li>
+  <li><a href="../modules/crit.inertia.html">crit.inertia</a></li>
+  <li><a href="../modules/crit.input_state.html">crit.input_state</a></li>
+  <li><a href="../modules/crit.intl.html">crit.intl</a></li>
+  <li><a href="../modules/crit.layout.html">crit.layout</a></li>
+  <li><a href="../modules/crit.observable.html">crit.observable</a></li>
+  <li><a href="../modules/crit.pick.html">crit.pick</a></li>
+  <li><a href="../modules/crit.progression.html">crit.progression</a></li>
+  <li><a href="../modules/crit.scroll.html">crit.scroll</a></li>
+  <li><a href="../modules/crit.scrollbar.html">crit.scrollbar</a></li>
+  <li><a href="../modules/crit.sys_config.html">crit.sys_config</a></li>
+  <li><a href="../modules/crit.table_util.html">crit.table_util</a></li>
+  <li><a href="../modules/crit.tooltip.html">crit.tooltip</a></li>
+  <li><a href="../modules/lib.held_keys.html">lib.held_keys</a></li>
+</ul>
+<h2>Scripts</h2>
+<ul class="nowrap">
+  <li><a href="../scripts/layers_from_fonts.editor_script.html">layers_from_fonts.editor_script</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+    <h1>Critique Gaming&rsquo;s boilerplate project</h1>
+
+<p>Ready-to-use starter project based on <a href="https://github.com/critique-gaming/crit">Crit</a>, <a href="https://github.com/britzl/monarch">Monarch</a> and <a href="https://github.com/subsoap/defos">DefOS</a>.</p>
+
+<p><a name="Features"></a></p>
+
+<h2>Features</h2>
+
+<ul>
+<li>Monarch and a fade-to-black screen transition for Monarch</li>
+<li>Coreograph your game&rsquo;s high-level progression with <a href="../modules/crit.progression.html#">crit.progression</a></li>
+<li>Wrapped a few Monarch functions as <a href="../modules/crit.progression.html#">crit.progression</a>-friendly versions</li>
+<li>Integrated <a href="../modules/crit.layout.html#">crit.layout</a> with the render script</li>
+<li><a href="../modules/crit.intl.html#">crit.intl</a></li>
+<li><a href="../modules/crit.analog_to_digital.html#">crit.analog_to_digital</a></li>
+<li>Set-up input method switching (<a href="../modules/crit.input_state.html#">crit.input_state</a>)</li>
+<li>Common global keybindings already set-up</li>
+<li>Quickly check which keys are being held down with the <code>held_keys</code> table</li>
+<li>Save profile management</li>
+<li>Testing and code coverage with <a href="https://github.com/britzl/deftest">DefTest</a>, <a href="https://travis-ci.com">TravisCI</a> and <a href="https://codecov.io">Codecov</a></li>
+<li>LDoc-ready documentation. Use the provided GitHub Actions workflow to
+<a href="https://critique-gaming.github.io/crit-boilerplate">publish it to GitHub Pages</a></li>
+</ul>
+
+
+<p><a name="Global_key_bindings"></a></p>
+
+<h2>Global key bindings</h2>
+
+<ul>
+<li><code>Alt + F4</code> (Windows and Linux only): Quit the game</li>
+<li><code>Alt + Enter</code>: Toggle full screen</li>
+<li><code>Ctrl + Backquote</code> (Debug builds only): Toggle profiler</li>
+<li><code>Ctrl + P</code> (Debug builds only): Toggle physics debugger</li>
+</ul>
+
+
+<p><a name="Useful___env_lua___https___critique_gaming_github_io_crit_modules_crit_env_html__variables"></a></p>
+
+<h2>Useful <a href="https://critique-gaming.github.io/crit/modules/crit.env.html"><code>env.lua</code></a> variables</h2>
+
+<p>Create a <code>_env/env.lua</code> file that returns a Lua table with development flags for the game.</p>
+
+<table>
+<thead>
+<tr>
+<th>Var name</th>
+<th>Type</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>window_width</code></td>
+<td><code>number</code></td>
+<td>On start-up, resize the window to this width.&ast;</td>
+</tr>
+<tr>
+<td><code>window_height</code></td>
+<td><code>number</code></td>
+<td>On start-up, resize the window to this height.&ast;</td>
+</tr>
+<tr>
+<td><code>display</code></td>
+<td><code>number</code></td>
+<td>On start-up, move the window to this display.</td>
+</tr>
+<tr>
+<td><code>full_screen</code></td>
+<td><code>boolean</code></td>
+<td>Force full screen (<code>true</code>) or windowed (<code>false</code>) on start-up.</td>
+</tr>
+<tr>
+<td><code>entry_progression</code></td>
+<td><a href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></td>
+<td>On start-up, run this progression instead of the <code>&quot;main&quot;</code> progression.</td>
+</tr>
+<tr>
+<td><code>entry_screen</code></td>
+<td><code>string or hash</code></td>
+<td>On start-up, load the Monarch screen with this ID.</td>
+</tr>
+<tr>
+<td><code>entry_screen_data</code></td>
+<td><code>any</code></td>
+<td>If <code>entry_screen</code> is specified, this will be the screen data passed to Monarch.</td>
+</tr>
+<tr>
+<td><code>language</code></td>
+<td><a href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></td>
+<td>Intl language override.</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>&ast;Specifying just one of <code>window_width</code> and <code>window_height</code> will assume the game&rsquo;s design aspect ratio (<code>display.width</code>:<code>display.height</code> from <code>game.project</code>, by default 16:9)</p>
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2020-07-22 10:19:30 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

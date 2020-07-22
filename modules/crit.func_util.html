@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Crit Boilerplace Reference</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>Crit Boilerplate</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/crit.analog_to_digital.html">crit.analog_to_digital</a></li>
+  <li><a href="../modules/crit.button.html">crit.button</a></li>
+  <li><a href="../modules/crit.colors.html">crit.colors</a></li>
+  <li><a href="../modules/crit.context.html">crit.context</a></li>
+  <li><a href="../modules/crit.cursor.html">crit.cursor</a></li>
+  <li><a href="../modules/crit.dispatcher.html">crit.dispatcher</a></li>
+  <li><a href="../modules/crit.drag_and_drop.html">crit.drag_and_drop</a></li>
+  <li><a href="../modules/crit.env.html">crit.env</a></li>
+  <li><a href="../modules/filters.html">filters</a></li>
+  <li><a href="../modules/crit.focus_giver.html">crit.focus_giver</a></li>
+  <li><strong>crit.func_util</strong></li>
+  <li><a href="../modules/crit.inertia.html">crit.inertia</a></li>
+  <li><a href="../modules/crit.input_state.html">crit.input_state</a></li>
+  <li><a href="../modules/crit.intl.html">crit.intl</a></li>
+  <li><a href="../modules/crit.layout.html">crit.layout</a></li>
+  <li><a href="../modules/crit.observable.html">crit.observable</a></li>
+  <li><a href="../modules/crit.pick.html">crit.pick</a></li>
+  <li><a href="../modules/crit.progression.html">crit.progression</a></li>
+  <li><a href="../modules/crit.scroll.html">crit.scroll</a></li>
+  <li><a href="../modules/crit.scrollbar.html">crit.scrollbar</a></li>
+  <li><a href="../modules/crit.sys_config.html">crit.sys_config</a></li>
+  <li><a href="../modules/crit.table_util.html">crit.table_util</a></li>
+  <li><a href="../modules/crit.tooltip.html">crit.tooltip</a></li>
+  <li><a href="../modules/lib.held_keys.html">lib.held_keys</a></li>
+</ul>
+<h2>Scripts</h2>
+<ul class="nowrap">
+  <li><a href="../scripts/layers_from_fonts.editor_script.html">layers_from_fonts.editor_script</a></li>
+</ul>
+<h2>Topics</h2>
+<ul class="">
+  <li><a href="../topics/README.md.html">README</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>crit.func_util</code></h1>
+<p>Utilities for working with functions.</p>
+<p></p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#bind">bind (f, arg)</a></td>
+	<td class="summary">Bind a first parameter to a function.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#compose">compose (...)</a></td>
+	<td class="summary">Compose multiple functions.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "bind"></a>
+    <strong>bind (f, arg)</strong>
+    </dt>
+    <dd>
+    Bind a first parameter to a function.
+ Returns a wrapped function with <code>arg</code> bound to the first parameter.
+ Call it with the remaining parameters.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">f</span>
+            <span class="types"><span class="type">function</span></span>
+         The function to wrap.
+        </li>
+        <li><span class="parameter">arg</span>
+            <span class="types"><span class="type">any</span></span>
+         The argument to bind as first argument.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">function</span></span>
+        The wrapped function.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "compose"></a>
+    <strong>compose (...)</strong>
+    </dt>
+    <dd>
+    Compose multiple functions.
+ Returns a function that chains the provided list of functions. For example,
+ <code>func_util.compose(f, g, h)(x)</code> is the equivalent of <code>f(g(h(x)))</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+            <span class="types"><span class="type">function</span></span>
+         A list of functions to compose. If empty, returns the identity function.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">function</span></span>
+        The composed function.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2020-07-22 10:19:30 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
