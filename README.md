@@ -2,7 +2,7 @@
 
 Ready-to-use starter project based on [Crit], [Monarch] and [DefOS].
 
-[Crit]: https://github.com/dapetcu21/crit
+[Crit]: https://github.com/critique-gaming/crit
 [Monarch]: https://github.com/britzl/monarch
 [DefOS]: https://github.com/subsoap/defos
 
