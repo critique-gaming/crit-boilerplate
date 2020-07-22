@@ -1,5 +1,5 @@
 project = 'Crit Boilerplate'
-title = 'Crit Boilerplace Reference'
+title = 'Crit Boilerplate Reference'
 format = 'discount'
 style='docs'
 readme = 'README.md'
