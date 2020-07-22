@@ -1,7 +1,7 @@
 project = 'Crit Boilerplate'
 package = 'crit'
 title = 'Crit Boilerplace Reference'
-file = '.'
+file = { 'lib', 'crit', 'game', 'main' }
 format = 'discount'
 style='docs'
 readme = 'README.md'
