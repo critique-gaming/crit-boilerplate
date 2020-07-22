@@ -31,7 +31,7 @@ Ready-to-use starter project based on [Crit], [Monarch] and [DefOS].
 * `Ctrl + Backquote` (Debug builds only): Toggle profiler
 * `Ctrl + P` (Debug builds only): Toggle physics debugger
 
-## Useful [`env.lua`](https://github.com/dapetcu21/crit/blob/master/docs/env.md) variables
+## Useful [`env.lua`](https://critique-gaming.github.io/crit/modules/crit.env.html) variables
 
 Create a `_env/env.lua` file that returns a Lua table with development flags for the game.
 
