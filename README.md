@@ -19,6 +19,8 @@ Ready-to-use starter project based on [Crit], [Monarch] and [DefOS].
 * Quickly check which keys are being held down with the `held_keys` table
 * Save profile management
 * Testing and code coverage with [DefTest], [TravisCI] and [Codecov]
+* LDoc-ready documentation. Use the provided GitHub Actions workflow to 
+[publish it to GitHub Pages](https://critique-gaming.github.io/crit-boilerplate)
 
 [DefTest]: https://github.com/britzl/deftest
 [TravisCI]: https://travis-ci.com

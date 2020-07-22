@@ -13,3 +13,4 @@ builtins
 *.sw*
 thumbs.db
 luacov.report.out
+doc
