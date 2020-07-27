@@ -22,3 +22,7 @@ jobs:
       run: 'java -jar .defold/bob.jar --variant debug build --keep-unused'
     - name: Run tests
       run: 'dmengine_headless --config=bootstrap.main_collection=/test/test.collectionc'
+    - name: Upload coverage to CodeCov
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
