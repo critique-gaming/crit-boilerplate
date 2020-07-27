@@ -18,12 +18,11 @@ Ready-to-use starter project based on [Crit], [Monarch] and [DefOS].
 * Common global keybindings already set-up
 * Quickly check which keys are being held down with the `held_keys` table
 * Save profile management
-* Testing and code coverage with [DefTest], [TravisCI] and [Codecov]
+* Testing and code coverage with [DefTest], [Codecov] and Github Actions.
 * LDoc-ready documentation. Use the provided GitHub Actions workflow to 
 [publish it to GitHub Pages](https://critique-gaming.github.io/crit-boilerplate)
 
 [DefTest]: https://github.com/britzl/deftest
-[TravisCI]: https://travis-ci.com
 [Codecov]: https://codecov.io
 
 ## Global key bindings
@@ -49,3 +48,12 @@ Create a `_env/env.lua` file that returns a Lua table with development flags for
 |`language`|`string`|Intl language override.|
 
 &ast;Specifying just one of `window_width` and `window_height` will assume the game's design aspect ratio (`display.width`:`display.height` from `game.project`, by default 16:9)
+
+## GitHub Actions
+
+All the GitHub Actions configured for this repository are configured to run when
+you push to the `dist` branch. If you prefer the tests always running when 
+pushing to any branch, just remove the `branches: [dist]` line in `run-tests.yml`.
+
+If you plan on making your project repository private, you'll need to obtain and 
+add a `CODECOV_TOKEN` to your secrets (in GitHub's repo settings).
