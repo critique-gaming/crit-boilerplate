@@ -1,0 +1,20 @@
+name: Run tests
+on:
+  workflow-dispatch:
+  push:
+    branches: [dist]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-java@v1
+      with:
+        java-version: '11'
+    - uses: dapetcu21/setup-defold@v1
+      with:
+        sha1: '29b8e598b0bce19b274327c5d9711f78b3bd0c22'
+    - run: 'java -jar .defold/bob.jar --auth "foobar" --email "john@doe.com" resolve'
+    - run: 'java -jar .defold/bob.jar --debug build --keep-unused'
+    - run: 'dmengine_headless --config=bootstrap.main_collection=/test/test.collectionc'
