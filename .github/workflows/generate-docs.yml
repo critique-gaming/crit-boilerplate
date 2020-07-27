@@ -1,5 +1,8 @@
 name: Generate documentation
-on: [workflow_dispatch]
+on:
+  workflow-dispatch:
+  push:
+    branches: [dist]
 
 jobs:
   build:
