@@ -1,0 +1,15 @@
+"DepotBuildConfig"
+{
+  "DepotID" "${depot_id_windows}"
+  "ContentRoot" "windows/${title}"
+  "FileMapping"
+  {
+    "LocalPath" "*"
+    "DepotPath" "."
+    "recursive" "1"
+  }
+  "FileExclusion" ".DS_Store"
+  "FileExclusion" "thumbs.db"
+  "FileExclusion" "Thumbs.db"
+  "FileExclusion" "*.pdb"
+}

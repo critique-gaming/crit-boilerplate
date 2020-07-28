@@ -1,0 +1,327 @@
+#!/usr/bin/env lua
+
+package.path = ('deploy/lib/?.lua;deploy/lib/?/init.lua;' .. package.path):gsub(".lua", ".lua_")
+
+local dotenv = require("deploy.dotenv")
+local argparse = require("argparse")
+
+local parser = argparse("deploy.lua", "Deploy script")
+parser:option("--bob", "Path to bob.jar")
+parser:option("--java-home", "Path to JAVA_HOME")
+parser:option("--defoldsdk", "Hash to a particular DefoldSDK version", dotenv.getenv("DEFOLDSDK"))
+parser:flag("-v --verbose", "Output verbose info")
+if dotenv.os_name == "Darwin" then
+  parser:flag("--skip-caffeinate", "Don't use caffeinate to keep the computer awake during the build")
+end
+
+local cmd_bob = parser:command("bob", "Invoke bob.jar manually"):target("cmd_bob")
+cmd_bob:argument("args", "Arguments to bob.jar"):args("*")
+
+parser:command("resolve", "Fetch dependencies"):target("cmd_resolve")
+
+local function mobile_options(cmd)
+  cmd:option("--version-code", "Override android.version_code and ios.build_number in game.project")
+  cmd:option("--apkx-main-version", "APK Expansion main file version")
+  cmd:option("--apkx-patch-version", "APK Expansion patch file version")
+  cmd:option("--android-certificate", "Path to an Android certificate", dotenv.getenv("ANDROID_CERTIFICATE"))
+  cmd:option("--android-private-key", "Path to an Android private key", dotenv.getenv("ANDROID_PRIVATE_KEY"))
+  cmd:option("--ios-identity", "iOS certificate identity", dotenv.getenv("IOS_IDENTITY"))
+  cmd:option("--ios-provisioning", "Path to the iOS provisioning profile", dotenv.getenv("IOS_PROVISIONING"))
+end
+
+local function notarize_options(cmd)
+  cmd:option("--apple-id", "Apple ID username", dotenv.getenv("APPLE_ID"))
+  cmd:option("--apple-id-password", "Apple ID password", dotenv.getenv("APPLE_ID_PASSWORD"))
+  cmd:option("--asc-provider", "Your short Apple Developer Account team ID", dotenv.getenv("ASC_PROVIDER"))
+end
+
+local function mac_options(cmd)
+  cmd:option("--mac-identity", "macOS certificate identity", dotenv.getenv("MAC_IDENTITY"))
+  cmd:flag("--skip-notarize", "Skip notarization")
+  notarize_options(cmd)
+end
+
+local function build_options(cmd)
+  cmd:flag("--debug", "Debug build. Release is default")
+  cmd:flag("--skip-git-status", "Skip checking if the project directory is clean before building")
+  cmd:flag("--no-cleanup", "Doesn't reset the repo to its original state after building with bob")
+  cmd:flag("--skip-texture-compression", "Skip texture compression")
+  cmd:option("--build-server", "Defold build server URL", dotenv.getenv("DEFOLD_BUILD_SERVER"))
+end
+
+local function version_options(cmd)
+  cmd:option("--version", "Override project.version in game.project")
+  cmd:option("--version-suffix", "Append suffix to version string")
+end
+
+local build_cmd = parser:command("build", "Build the game"):target("cmd_build")
+build_cmd:argument("platform",
+  "One of windows, mac, linux, ios, android, web, switch. Omit to build for all desktop platforms"
+):args("?")
+build_cmd:option("-bo --build-output", "Build output directory")
+build_options(build_cmd)
+version_options(build_cmd)
+mobile_options(build_cmd)
+mac_options(build_cmd)
+
+local notarize_cmd = parser:command("notarize", "Notarize the macOS build of the game"):target("cmd_notarize")
+notarize_cmd:argument("app_path",
+  "Path to the .app. Omit to notarize the default mac build"
+):args("?")
+notarize_options(notarize_cmd)
+
+local package_cmd = parser:command("package", "Package game for DRM-free distribution"):target("cmd_package")
+package_cmd:argument("platform",
+  "One of windows, mac, linux, ios, android, web, switch. Omit to build for all desktop platforms"
+):args("?")
+package_cmd:option("-o --output", "Packaging output directory")
+build_cmd:option("-bo --build-output", "Build output directory")
+package_cmd:flag("--skip-build", "Skip building (just package)")
+build_options(package_cmd)
+version_options(package_cmd)
+mobile_options(package_cmd)
+mac_options(package_cmd)
+
+local steam_cmd = parser:command("steam", "Build and upload game to Steam"):target("cmd_steam")
+steam_cmd:argument("branch", "The branch to build to. Omit to build all branches" ):args("?")
+steam_cmd:flag("--skip-build", "Skip building (just upload)")
+steam_cmd:option("-bo --build-output", "Build output directory")
+build_options(steam_cmd)
+steam_cmd:option("--steamcmd", "Path to steamcmd", dotenv.getenv("STEAMCMD"))
+steam_cmd:option("--steam-user", "Steam account ID", dotenv.getenv("STEAM_USER"))
+steam_cmd:option("--steam-password", "Steam account password")
+steam_cmd:flag("--test-login", "Skip building and only test Steam login")
+steam_cmd:flag("--preview", "Simulate uploading and generate depot reports")
+mac_options(steam_cmd)
+
+local gog_cmd = parser:command("gog", "Build and upload game to GOG.com"):target("cmd_gog")
+gog_cmd:argument("branch", "The branch to build to. Omit to build all branches" ):args("?")
+gog_cmd:argument("platform", "One of windows, mac, linux. Omit to build for all desktop platforms"):args("?")
+gog_cmd:flag("--skip-build", "Skip building (just upload)")
+gog_cmd:option("-bo --build-output", "Build output directory")
+build_options(steam_cmd)
+gog_cmd:option("--gog-pipeline-builder", "Path to GOG Galaxy Pipeline Builder", dotenv.getenv("GOG_PIPELINE_BUILDER"))
+gog_cmd:option("--gog-user", "GOG.com account ID", dotenv.getenv("GOG_USER"))
+gog_cmd:option("--gog-password", "GOG.com account password")
+mac_options(steam_cmd)
+
+local intl_export_cmd = parser:command("intl_export", "Export all intl strings from the game")
+intl_export_cmd:argument("out_dir", "Path where the files will be exported")
+intl_export_cmd:option("--format", "Output format. One of: lua, csv", "lua")
+
+local intl_import_cmd = parser:command("intl_import", "Import intl strings into the game")
+intl_import_cmd:argument("input_path", "Path to a file or directory of intl files")
+
+local zip_diff_cmd = parser:command("zip_diff", "Given two zip files, generate a zip that contains only the new files added in the first zip, when compared to the second one")
+zip_diff_cmd:argument("out_file", "Path to the resulting zip diff")
+zip_diff_cmd:argument("new_file", "Path to the first (new) zip")
+zip_diff_cmd:argument("old_file", "Path to the second (old) zip")
+
+local bob_passthrough = false
+local bob_args = {}
+local parsed_args = {}
+for _, v in ipairs(arg) do
+  if bob_passthrough then
+    table.insert(bob_args, v)
+  else
+    table.insert(parsed_args, v)
+  end
+  if v == "bob" then
+    bob_passthrough = true
+  end
+end
+
+local args = parser:parse(parsed_args)
+
+if dotenv.os_name == "Darwin" and not args.skip_caffeinate then
+  local shell = require("deploy.lib.shell")
+
+  local caffeinate_args = { "caffeinate", "-d", "-s" }
+
+  local lowest = 1
+  while arg[lowest - 1] do
+    lowest = lowest - 1
+  end
+  for i = lowest, 0 do
+    table.insert(caffeinate_args, arg[i])
+  end
+  table.insert(caffeinate_args, "--skip-caffeinate")
+  for i = 1, #arg do
+    table.insert(caffeinate_args, arg[i])
+  end
+
+  local ok, _, code = shell.execute(caffeinate_args)
+
+  if type(ok) == "number" then
+    os.exit(ok)
+  end
+  if type(code) == "number" then
+    os.exit(code)
+  end
+  os.exit(0)
+  return
+end
+
+local function check_git_status_if_needed()
+  if not args.skip_git_status then
+    local check_git_status = require("deploy.git_status")
+    if not check_git_status() then
+      print(
+        "ABORTING! The project directory is unclean (according to git status). " ..
+        "If you really know what you're doing, run again with --skip-git-status"
+      )
+      os.exit(1)
+    end
+  end
+end
+
+if args.bob then
+  dotenv.setenv("BOB", args.bob)
+end
+
+if args.java_home then
+  dotenv.setenv("JAVA_HOME", args.java_home)
+end
+
+if args.verbose then
+  dotenv.verbose = true
+end
+
+if args.cmd_bob then
+  local bob = require("deploy.bob")
+  bob.run(bob_args)
+
+elseif args.cmd_resolve then
+  local bob = require("deploy.bob")
+  bob.resolve()
+
+elseif args.cmd_build or args.cmd_package then
+  check_git_status_if_needed()
+
+  if not args.skip_resolve and not args.skip_build then
+    local bob = require("deploy.bob")
+    bob.resolve(args)
+  end
+
+  local path = require("path")
+
+  local function package(build_output, platform)
+    if not args.skip_build then
+      local build = require("deploy.build")
+      build(platform, build_output, args)
+    end
+
+    local notarize
+    local app_path
+    local notarization_id
+    if platform == "mac" and not args.skip_notarize and args.apple_id and args.apple_id_password then
+      notarize = require("deploy.notarize")
+      local read_project = require("deploy.project")
+      local project_title = read_project().title
+      app_path = path.join(build_output, project_title .. ".app")
+      notarization_id = notarize.notarize(app_path, args)
+    end
+
+    -- Split process in two steps so that we do other things while notarization finishes
+    return function ()
+      if notarize then
+        notarize.staple(notarization_id, app_path, args)
+      end
+
+      if args.cmd_package then
+        local package_build = require("deploy.package")
+        local package_output = args.output or path.join("dist", "package")
+        package_build(platform, build_output, package_output)
+      end
+    end
+  end
+
+  if args.platform then
+    package(args.build_output or path.join("dist", "build", args.platform), args.platform)()
+
+  else
+    local platforms = { "mac", "windows", "linux" }
+    local finish = {}
+    for _, platform in ipairs(platforms) do
+      finish[#finish + 1] = package(
+        path.join(args.build_output or path.join("dist", "build"), platform),
+        platform
+      )
+    end
+    for _, finish_func in ipairs(finish) do
+      finish_func()
+    end
+  end
+
+elseif args.cmd_notarize then
+  local notarize = require("deploy.notarize")
+  local path = require("path")
+  local app_path = args.app_path
+  if not app_path then
+    local read_project = require("deploy.project")
+    app_path = path.join("dist", "build", "mac", read_project().title .. ".app")
+  end
+  notarize.notarize_and_staple(app_path, args)
+
+elseif args.cmd_steam then
+  check_git_status_if_needed()
+
+  if not args.skip_resolve and not args.skip_build and not args.test_login then
+    local bob = require("deploy.bob")
+    bob.resolve({ steam = true })
+  end
+
+  args.steam_password = args.steam_password or dotenv.getenv("STEAM_PASSWORD")
+
+  local steam = require("deploy.steam")
+
+  if args.test_login then
+    steam.steam_login(args)
+    return
+  end
+
+  local path = require("path")
+  if args.branch then
+    local build_dir = args.build_output or path.join("dist", "steam", args.branch)
+    steam.steam_upload(args.branch, build_dir, args)
+  else
+    steam.steam_upload_all(path.join("dist", "steam"), args)
+  end
+
+elseif args.cmd_gog then
+  check_git_status_if_needed()
+
+  if not args.skip_resolve and not args.skip_build then
+    local bob = require("deploy.bob")
+    bob.resolve()
+  end
+
+  args.gog_password = args.gog_password or dotenv.getenv("GOG_PASSWORD")
+
+  local gog = require("deploy.gog")
+
+  local path = require("path")
+  local gog_upload = gog.gog_upload
+  if args.branch then
+    local build_dir = args.build_output or path.join("dist", "gog", args.branch)
+    gog_upload(args.branch, args.platform and { args.platform }, build_dir, args)
+  else
+    path.each(path.join("deploy", "gog", "*"), function (branch)
+      local build_dir = path.join(args.build_output or path.join("dist", "gog"), branch)
+      gog_upload(branch, nil, build_dir, args)
+    end, { param = "n", skipfiles = true })
+  end
+
+elseif args.intl_export then
+  local intl_cmd = require("deploy.intl_cmd")
+  intl_cmd.export(args.format, args.out_dir)
+
+elseif args.intl_import then
+  local intl_cmd = require("deploy.intl_cmd")
+  intl_cmd.import(args.input_path)
+
+elseif args.zip_diff then
+  local zip_diff = require("deploy.zip_diff")
+  zip_diff(args.out_file, args.new_file, args.old_file)
+
+end

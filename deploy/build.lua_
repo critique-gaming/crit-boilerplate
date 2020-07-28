@@ -1,0 +1,269 @@
+local bob = require("deploy.bob")
+local path = require("path")
+local util = require("deploy.util")
+local shell = require("shell")
+local read_project = require("deploy.project")
+local dotenv = require("deploy.dotenv")
+
+local platforms = {
+  mac = "x86_64-darwin",
+  linux = "x86_64-linux",
+  windows = "x86_64-win32",
+  android = "armv7-android",
+  ios = "armv7-darwin",
+  web = "js-web",
+  switch = "arm64-nx64",
+}
+
+local function rmdir(p)
+  pcall(function ()
+    path.each(path.join(p,"*"), function(P)
+      path.remove(P)
+    end,{
+      param = "f";   -- request full path
+      delay = true;   -- use snapshot of directory
+      recurse = true; -- include subdirs
+      reverse = true; -- subdirs at first
+    })
+    path.remove(p)
+  end)
+end
+
+local bank_paths = {
+  windows = path.join("resources", "bundled", "win32", "banks"),
+  mac = path.join("resources", "bundled", "osx", "Contents", "Resources", "banks"),
+  linux = path.join("resources", "bundled", "linux", "banks"),
+  ios = path.join("resources", "bundled", "ios", "banks"),
+  android = path.join("resources", "bundled", "android", "assets", "banks"),
+  switch = path.join("resources", "bundled", "nx64", "banks"),
+}
+
+local function edit_game_project(platform, options)
+  local game_project_path = "game.project"
+
+  local project_str = util.read_file(game_project_path)
+  local original_project_str = project_str
+
+  if not options.debug then
+    project_str = project_str:gsub("debug.appmanifest", "release.appmanifest")
+  end
+
+  local version = (options.version or read_project().full_version) .. (options.version_suffix or "")
+  project_str = project_str:gsub("(version = [^\n]*)", "%1\nfull_version = " .. version)
+
+  if options.version_code then
+    project_str = project_str:gsub("version_code = [^\n]*", "version_code = " .. options.version_code)
+    project_str = project_str:gsub("build_number = [^\n]*", "build_number = " .. options.version_code)
+  end
+
+  if options.skip_texture_compression then
+    project_str = project_str:gsub(
+      "texture_profiles = [^\n]*",
+      "texture_profiles = /builtins/graphics/default.texture_profiles"
+    )
+  end
+
+  if options.apkx_patch_version or options.apkx_main_version then
+    project_str = project_str .. "\n\n[apkx]\n"
+    if options.apkx_main_version then
+      project_str = project_str .. "main_version" .. options.apkx_main_version .. "\n"
+    end
+    if options.apkx_patch_version then
+      project_str = project_str .. "patch_version" .. options.apkx_patch_version .. "\n"
+    end
+  end
+
+  project_str = bob.inject_dependencies_string(project_str, bob.get_platform_dependencies(options, platform))
+
+  local project_changed = project_str ~= original_project_str
+  if project_changed then
+    util.write_file(game_project_path, project_str)
+  end
+
+  return function ()
+    if project_changed then
+      util.write_file(game_project_path, original_project_str)
+    end
+  end
+end
+
+local function write_env_lua()
+  local env_lua_path = path.join("_env", "env.lua")
+
+  local original_env_str
+  local env_lua = io.open(env_lua_path, "r")
+  if env_lua then
+    original_env_str = env_lua:read("*all")
+    env_lua:close()
+  end
+
+  local env_str = "return { bundled = true }"
+  util.write_file(env_lua_path, env_str)
+
+  return function ()
+    if original_env_str then
+      util.write_file(env_lua_path, original_env_str)
+    else
+      pcall(function () path.remove(env_lua_path) end)
+    end
+  end
+end
+
+local function run_codesign(item, identity)
+  shell.pexecute({
+    "xcrun",
+    "codesign",
+    "--force",
+    "--sign", identity,
+    "--options", "runtime",
+    "--timestamp",
+    "--no-strict",
+    "--entitlements", path.join("deploy", "entitlements.plist"),
+    item
+  })
+end
+
+local function codesign(platform, output_dir, options)
+  if platform ~= "mac" or not options.mac_identity then
+    return
+  end
+  print("Code signing for " .. platform .. "...")
+
+  if dotenv.os_name ~= "Darwin" then
+    error("Code signing macOS builds can only be done on macOS")
+  end
+
+  local project_title = read_project().title
+  local app_path = path.join(output_dir, project_title .. ".app")
+  local identity = options.mac_identity
+
+  path.each(path.join(app_path, "Contents", "MacOS", "*.dylib"), function (binary)
+    run_codesign(binary, identity)
+  end)
+  run_codesign(app_path, identity)
+
+  return app_path
+end
+
+local function build(platform, output_dir, options)
+  print("Building for " .. platform .. "...")
+
+  local platform_name = platforms[platform]
+  if not platform_name then
+    error("Unsupported platform: " .. platform)
+  end
+
+  rmdir("build")
+  rmdir(path.join(".internal", "cache"))
+  rmdir(output_dir)
+
+  path.mkdir(output_dir)
+
+  local restore_game_project = edit_game_project(platform, options)
+  local restore_env_lua = write_env_lua()
+
+  local function restore()
+    if options.no_cleanup then
+      print(
+        "WARNING: Running with --no-cleanup means that the repo will be left in an unclean state. " ..
+        "Please run something like `git add . && git reset --hard` before running this script again."
+      )
+      return
+    end
+
+    restore_env_lua()
+    restore_game_project()
+  end
+
+  local variant = options.debug and "debug" or "release"
+  local bob_args = {
+    "--platform", platform_name, "--archive", "-bo", output_dir, "--variant=" .. variant,
+    "--with-symbols",
+    "distclean", "build", "bundle"
+  }
+
+  if options.build_server and options.build_server ~= "" then
+    table.insert(bob_args, "--build-server=" .. options.build_server)
+  end
+
+  if options.defoldsdk and options.defoldsdk ~= "" then
+    bob_args[#bob_args + 1] = "--defoldsdk"
+    bob_args[#bob_args + 1] = options.defoldsdk
+  end
+
+  if not options.skip_texture_compression then
+    table.insert(bob_args, "--texture-compression")
+    table.insert(bob_args, "true")
+  end
+
+  if platform == "ios" then
+    assert(options.ios_identity, "--ios-identity is required for iOS builds")
+    assert(options.ios_provisioning, "--ios-provisioning is required for iOS builds")
+    table.insert(bob_args, "--identity")
+    table.insert(bob_args, options.ios_identity)
+    table.insert(bob_args, "--mobileprovisioning")
+    table.insert(bob_args, options.ios_provisioning)
+  end
+
+  if platform == "android" then
+    if options.android_certificate then
+      table.insert(bob_args, "--certificate")
+      table.insert(bob_args, options.android_certificate)
+    end
+    if options.android_private_key then
+      table.insert(bob_args, "--private-key")
+      table.insert(bob_args, options.android_private_key)
+    end
+    if options.apkx_patch_version and not options.apkx_main_version then
+      error("Cannot use --apkx-patch-version without --apkx-main-version")
+    end
+    if options.apkx_main_version then
+      table.insert(bob_args, "--liveupdate")
+      table.insert(bob_args, "yes")
+    end
+  end
+
+  if options.debug and (platform == "android" or platform == "ios") then
+    table.insert(bob_args, "--strip-executable")
+  end
+
+  if platform == "switch" then
+    table.insert(bob_args, "--settings")
+    table.insert(bob_args, "switch.ini")
+  end
+
+  if options.steam then
+    table.insert(bob_args, "--settings")
+    table.insert(bob_args, "steam.ini")
+  end
+
+  if options.gog then
+    table.insert(bob_args, "--settings")
+    table.insert(bob_args, "gog.ini")
+  end
+
+  local ok, error_msg = pcall(function ()
+    bob.run(bob_args)
+  end)
+
+  if not ok then
+    restore()
+    error(error_msg)
+  end
+
+  restore()
+
+  if platform == "windows" then
+    local project_title = read_project().title
+    pcall(function ()
+      path.rename(
+        path.join(output_dir, project_title, "dmengine.pdb"),
+        path.join(output_dir, "dmengine.pdb")
+      )
+    end)
+  end
+
+  codesign(platform, output_dir, options)
+end
+
+return build

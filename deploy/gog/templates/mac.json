@@ -1,0 +1,43 @@
+{
+    "project": {
+        "baseProductId": "${product_id}",
+        "clientId": "${client_id}",
+        "clientSecret": "${client_secret}",
+        "version": "${full_version}",
+        "installDirectory": "${title}.app",
+        "name": "${title}",
+        "platform": "osx",
+        "tags": [
+            "editor_v_1_4_0"
+        ],
+        "languageMode": "together",
+        "products": [
+            {
+                "name": "${title}",
+                "productId": "${product_id}",
+                "depots": [
+                    {
+                        "name": "main",
+                        "folder": "${build_dir}/mac/${title}.app",
+                        "languages": [
+                            "en-US"
+                        ]
+                    }
+                ],
+                "tasks": [
+                    {
+                        "type": "FileTask",
+                        "name": "${title}",
+                        "languages": [
+                            "en-US"
+                        ],
+                        "category": "game",
+                        "path": "Contents/MacOS/${title}",
+                        "isPrimary": true
+                    }
+                ],
+                "supportDepots": []
+            }
+        ]
+    }
+}

@@ -1,0 +1,145 @@
+local dotenv = require("deploy.dotenv")
+local util = require("deploy.util")
+local shell = require("shell")
+local path = require("path")
+
+local java_home = dotenv.getenv("JAVA_HOME")
+local java_home_override = dotenv.env["JAVA_HOME"]
+local java = dotenv.getenv("JAVA_BIN") or (
+  java_home and java_home ~= "" and path.join(java_home, "bin", "java")
+) or "java"
+
+local bob_path = dotenv.getenv("BOB")
+if not bob_path then
+  print("Please set the BOB env var to the path to bob.jar")
+  os.exit(1)
+end
+
+local M = {}
+
+function M.run(args)
+  local java_args = {}
+  if java_home_override and java_home_override ~= "" then
+    if dotenv.os_name == "Windows" then
+      java_args.prefix = "set \"JAVA_HOME=" .. java_home .. "\" && "
+    else
+      table.insert(java_args, "env")
+      table.insert(java_args, "JAVA_HOME=" .. java_home)
+    end
+  end
+  table.insert(java_args, java)
+  table.insert(java_args, "-Xmx5g")
+  table.insert(java_args, "-jar")
+  table.insert(java_args, bob_path)
+  for _, v in ipairs(args) do
+    table.insert(java_args, v)
+  end
+  if dotenv.verbose then
+    print(shell.escape(java_args))
+  end
+  shell.pexecute(java_args)
+end
+
+-- Add any dependency that you want to omit on a particular platform
+local per_platform_removed_dependencies = {
+  switch = { "subsoap/defos" },
+  ios = { "subsoap/defos" },
+  android = { "subsoap/defos" },
+}
+
+function M.get_platform_dependencies(opts, platform)
+  -- Add any dependency you want to add depending on platform or options
+  local additional_deps = {}
+  if opts and opts.steam then
+    additional_deps[#additional_deps + 1] =
+      dotenv.getenv("STEAMWORKS_DEPENDENCY_URL") or "https://github.com/britzl/steamworks-defold/archive/2.0.0.zip"
+  end
+
+  if opts and opts.steam then
+    additional_deps[#additional_deps + 1] = dotenv.getenv("GOG_GALAXY_DEPENDENCY_URL")
+  end
+
+  if platform == "switch" then
+    additional_deps[#additional_deps + 1] = dotenv.getenv("SWITCH_DEPENDENCY_URL")
+  end
+
+  local removed_deps = per_platform_removed_dependencies[platform]
+
+  return additional_deps, removed_deps
+end
+
+function M.inject_dependencies_string(project_str, additional_deps, removed_deps)
+  if removed_deps and next(removed_deps) then
+    project_str = project_str:gsub("(dependencies = )([^\n%s]*)", function (match_start, deps_string)
+      local deps = {}
+      for dep in deps_string:gmatch('[^,]+') do
+        local removed = false
+        for _, item in ipairs(removed_deps) do
+          if dep:match(item) then
+            removed = true
+            break
+          end
+        end
+        if not removed then
+          deps[#deps + 1] = dep
+        end
+      end
+      return match_start .. table.concat(deps, ",")
+    end)
+  end
+
+  if additional_deps and next(additional_deps) then
+    project_str = project_str:gsub("dependencies = [^\n%s]*", function (deps)
+      return deps .. "," .. table.concat(additional_deps, ",")
+    end)
+  end
+
+  return project_str
+end
+
+function M.inject_dependencies(additional_deps, removed_deps)
+  local game_project_path = "game.project"
+
+  local project_str = util.read_file(game_project_path)
+  local original_project_str = project_str
+
+  project_str = M.inject_dependencies_string(project_str, additional_deps, removed_deps)
+
+  if project_str == original_project_str then
+    return function () end, false
+  end
+
+  util.write_file(game_project_path, project_str)
+
+  return function ()
+    util.write_file(game_project_path, original_project_str)
+  end, true
+end
+
+function M.resolve(opts)
+  print("Fetching dependencies...")
+
+  local bob_args = { "--email", "foo@bar.com", "--auth", "12345", "resolve" }
+
+  if opts and opts.defoldsdk and opts.defoldsdk ~= "" then
+    bob_args[#bob_args + 1] = "--defoldsdk"
+    bob_args[#bob_args + 1] = opts.defoldsdk
+  end
+
+  local restore, made_changes = M.inject_dependencies(M.get_platform_dependencies(opts, opts and opts.platform))
+  if made_changes then
+    local ok, error_msg = pcall(function ()
+      M.run(bob_args)
+    end)
+
+    restore()
+
+    if not ok then
+      error(error_msg)
+    end
+  else
+    M.run(bob_args)
+  end
+end
+
+return M

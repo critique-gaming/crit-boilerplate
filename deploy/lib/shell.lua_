@@ -1,0 +1,48 @@
+local dotenv = require("deploy.dotenv")
+
+local shell = {}
+
+if dotenv.os_name == "Windows" then
+  function shell.escape(args, popen)
+    local ret = {}
+    for i, a in ipairs(args) do
+      local s = tostring(a)
+      if (not popen or i ~= 1) and s:match("[^A-Za-z0-9_/\\:=-]") then
+        s = "\""..s:gsub("\"", "\"\"").."\""
+      end
+      table.insert(ret, s)
+    end
+    return (args.prefix or "") .. table.concat(ret, " ")
+  end
+else
+  function shell.escape(args)
+    local ret = {}
+    for _,a in ipairs(args) do
+      local s = tostring(a)
+      if s:match("[^A-Za-z0-9_/:=-]") then
+        s = "'"..s:gsub("'", "'\\''").."'"
+      end
+      table.insert(ret, s)
+    end
+    return table.concat(ret, " ")
+  end
+end
+
+function shell.run(args)
+  local h = io.popen(shell.escape(args, true))
+  local outstr = h:read("*a")
+  return outstr, h:close()
+end
+
+shell.read = shell.run
+
+function shell.execute(args)
+  return os.execute(shell.escape(args))
+end
+
+function shell.pexecute(args)
+  local ok, action, code = shell.execute(args)
+  assert(ok == 0 or (ok == true and action == "exit" and code == 0), "Command exited with non-zero status code")
+end
+
+return shell

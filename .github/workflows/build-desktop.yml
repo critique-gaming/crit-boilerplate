@@ -1,0 +1,51 @@
+name: Build for macOS, Windows and Linux
+on:
+  workflow_dispatch:
+  push:
+    branches: [dist-desktop]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup Java
+      uses: actions/setup-java@v1
+      with:
+        java-version: '11'
+    - name: Setup Defold
+      uses: dapetcu21/setup-defold@v1
+    - name: Setup LuaJIT
+      uses: leafo/gh-actions-lua@v6
+      with:
+        luaVersion: "luajit-2.1.0-beta3"
+    - name: Import Code-signing certs
+      uses: apple-actions/import-codesign-certs@v1
+      with: 
+        p12-file-base64: ${{ secrets.CERTIFICATES_P12 }}
+        p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
+    - name: Set environment variables
+      run: > 
+        echo ::set-env name=BOB::.defold/bob.jar &&
+        echo ::set-env name=MAC_IDENTITY::${{ secrets.MAC_IDENTITY }} &&
+        echo ::set-env name=APPLE_ID::${{ secrets.APPLE_ID }} &&
+        echo ::set-env name=APPLE_ID_PASSWORD::${{ secrets.APPLE_ID_PASSWORD }} &&
+        echo ::set-env name=ASC_PROVIDER::${{ secrets.ASC_PROVIDER }}
+    - name: Make release builds
+      run: 'lua deploy.lua_ build --skip-git-status'
+    - name: Archive macOS release build
+      uses: actions/upload-artifact@v2
+      with:
+        name: release-mac
+        path: dist/build/mac
+    - name: Archive Windows release build
+      uses: actions/upload-artifact@v2
+      with:
+        name: release-windows
+        path: dist/build/windows
+    - name: Archive Linux release build
+      uses: actions/upload-artifact@v2
+      with:
+        name: release-linux
+        path: dist/build/linux

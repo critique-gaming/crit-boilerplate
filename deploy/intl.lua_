@@ -1,0 +1,147 @@
+local csv = require "csv"
+
+local function trim_final_newlines(intl_data)
+  for i = #intl_data, 1, -1 do
+    if not intl_data[i].key then
+      intl_data[i] = nil
+    else
+      break
+    end
+  end
+end
+
+local function parse(format, data)
+  if format == "lua" then
+    local reference_data = assert((loadstring or load)(data))()
+
+    local parsed_keys = {}
+    local intl_data = {}
+
+    for line in data:gmatch("[^\r\n]*") do
+      local chunk = (loadstring or load)("return { " .. line .. " }")
+      if chunk then
+        local ok, tmp_table = pcall(chunk)
+        if ok and tmp_table then
+          local key = next(tmp_table)
+          if key then
+            if not parsed_keys[key] and reference_data[key] then
+              intl_data[#intl_data + 1] = { key = key, value = reference_data[key] }
+              parsed_keys[key] = true
+            end
+          else
+            intl_data[#intl_data + 1] = {}
+          end
+        end
+      end
+    end
+
+    trim_final_newlines(intl_data)
+
+    for key, value in pairs(reference_data) do
+      if not parsed_keys[key] then
+        intl_data[#intl_data + 1] = { key = key, value = value }
+        parsed_keys[key] = true
+      end
+    end
+
+    return intl_data
+
+  elseif format == "csv" then
+    local intl_data = {}
+    local f = csv.openstring(data)
+    for fields in f:lines() do
+      if fields[1] and fields[1] ~= "" then
+        intl_data[#intl_data + 1] = { key = fields[1], value = fields[2] or "" }
+      else
+        intl_data[#intl_data + 1] = {}
+      end
+    end
+
+    trim_final_newlines(intl_data)
+
+    return intl_data
+
+  else
+    error("intl format not supported: " .. format)
+  end
+end
+
+local function escape_csv(str)
+  if not string.find(str, "[,\r\n]") then
+    return str
+  end
+  return "\"" .. string.gsub(str, "\"", "\"\"") .. "\""
+end
+
+local function stringify_string(s)
+  return string.gsub(string.format("%q", s), "\\\n", "\\n")
+end
+
+local function stringify(format, data)
+  if format == "lua" then
+    local lines = { "-- luacheck: no max line length\n", "return {\n" }
+    for i, entry in ipairs(data) do
+      if entry.key then
+        lines[i + 2] = string.format("  [%q] = %s,\n", entry.key, stringify_string(entry.value))
+      else
+        lines[i + 2] = "\n"
+      end
+    end
+    lines[#lines + 1] = "}\n"
+    return table.concat(lines)
+
+  elseif format == "csv" then
+    local lines = {}
+    for i, entry in ipairs(data) do
+      if entry.key then
+        lines[i] = escape_csv(entry.key) .. "," .. escape_csv(entry.value) .. "\n"
+      else
+        lines[i] = ",\n"
+      end
+    end
+    return table.concat(lines)
+
+  else
+    error("intl format not supported: " .. format)
+  end
+end
+
+local function find_entry(t, key)
+  for _, searched_entry in ipairs(t) do
+    if key == searched_entry.key then
+      return searched_entry
+    end
+  end
+end
+
+local function merge(dst, src)
+  if not dst then return src end
+  if not src then return dst end
+
+  local n = 0
+  local result = {}
+
+  for _, entry in ipairs(dst) do
+    local found_entry = entry.key and find_entry(src, entry.key)
+    n = n + 1
+    result[n] = found_entry or entry
+  end
+
+  for _, entry in ipairs(src) do
+    if entry.key then
+      local found_entry = find_entry(dst, entry.key)
+      if not found_entry then
+        n = n + 1
+        result[n] = entry
+      end
+    end
+  end
+
+  return result
+end
+
+return {
+  parse = parse,
+  stringify = stringify,
+  merge = merge,
+}

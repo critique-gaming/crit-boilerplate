@@ -1,0 +1,44 @@
+local zip = require "deploy.zip"
+local path = require("path")
+
+return function (out_zip, new_zip, old_zip)
+  local new_files = zip.list(new_zip)
+  local old_files = zip.list(old_zip)
+
+  local old_files_map = {}
+  for _, file in ipairs(old_files) do
+    old_files_map[file.name] = file
+  end
+
+  local diff_file_list = {}
+
+  for _, file in ipairs(new_files) do
+    if not old_files_map[file.name] or old_files_map[file.name].hash ~= file.hash then
+      diff_file_list[#diff_file_list + 1] = file.name
+    end
+  end
+
+  local tmp_dir = out_zip .. ".tmp"
+  path.mkdir(tmp_dir)
+
+  local new_zip_full = path.fullpath(new_zip)
+
+  pcall(function () path.remove(out_zip) end)
+
+  local pwd = path.currentdir()
+  path.chdir(tmp_dir)
+
+  zip.unzip(new_zip_full)
+
+  local _, file_name = path.splitpath(out_zip)
+  zip.zip_files(path.join("..", file_name), diff_file_list)
+
+  path.chdir(pwd)
+
+  path.each(path.join(tmp_dir, "*"), function (file) path.remove(file) end, {
+    delay = true,
+    recurse = true,
+    reverse = true,
+  })
+  path.remove(tmp_dir)
+end

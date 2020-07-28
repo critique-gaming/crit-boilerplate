@@ -1,0 +1,14 @@
+"appbuild"
+{
+  "appid" "${app_id}"
+  "desc" "${title} ${full_version}"
+  "buildoutput" "build_output"
+  "preview" "${preview}"
+  "setlive" "${branch}"
+  "depots"
+  {
+    "${depot_id_windows}" "depot_build_windows.vdf"
+    "${depot_id_mac}" "depot_build_mac.vdf"
+    "${depot_id_linux}" "depot_build_linux.vdf"
+  }
+}

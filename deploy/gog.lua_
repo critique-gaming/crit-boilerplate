@@ -1,0 +1,75 @@
+local path = require("path")
+local shell = require("shell")
+local read_project = require("deploy.project")
+local notarize = require("deploy.notarize")
+local dotenv = require("deploy.dotenv")
+local util = require("deploy.util")
+
+local function gog_upload(branch, platforms, build_dir, options)
+  print("Building for GOG branch \"" .. branch .. "\"...")
+
+  assert(options.gog_pipeline_builder, "--gog-pipeline-builder is required")
+  assert(options.gog_user, "--gog-user is required")
+  assert(options.gog_password, "--gog-password is required")
+
+  local config = require("deploy.gog.config")
+  local branch_config = config[branch]
+  assert(branch_config, "No such GOG branch defined in config: " .. branch)
+
+  local build_options = util.deep_clone(branch.build_options)
+  build_options.mac_identity = options.mac_identity
+
+  path.mkdir(build_dir)
+
+  local template_args = util.deep_clone(read_project())
+  template_args.build_dir = path.fullpath(build_dir)
+  template_args.full_version = template_args.full_version .. (build_options.version_suffix or "")
+
+  for k, v in pairs(branch_config.template) do
+    template_args[k] = v
+  end
+
+  platforms = platforms or { "mac", "windows", "linux" }
+
+  if not options.skip_build then
+    local build = require("deploy.build")
+    local mac_app_path, notarization_request_uuid
+    for _, platform in ipairs(platforms) do
+      local build_output = path.join(build_dir, platform)
+      build(platform, build_output, build_options)
+
+      if platform == "mac" and not options.skip_notarize and options.apple_id and options.apple_id_password then
+        mac_app_path = path.join(build_output, template_args.title .. ".app")
+        notarization_request_uuid = notarize.notarize(mac_app_path, options)
+      end
+    end
+
+    if notarization_request_uuid then
+      notarize.staple(notarization_request_uuid, mac_app_path, options)
+    end
+  end
+
+  print("Uploading to GOG.com branch \"" .. branch .. "\"...")
+  for _, platform in ipairs(platforms) do
+    local project_path = path.join(build_dir, platform .. ".json")
+    util.template(
+      path.join("deploy", "gog", "products", build_options.gog_product, platform .. ".json"),
+      project_path,
+      template_args
+    )
+
+    local branch_password = dotenv.getenv("GOG_BRANCH_PASSWORD_" .. branch)
+
+    shell.pexecute({ options.gog_pipeline_builder,
+      "build-game", project_path,
+      "--username=" .. options.gog_user,
+      "--password=" .. options.gog_password,
+      "--branch=" .. branch,
+      "--branch_password=" .. branch_password,
+    })
+  end
+end
+
+return {
+  gog_upload = gog_upload,
+}

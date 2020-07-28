@@ -1,0 +1,47 @@
+local function read_file(filename)
+  local f, err = io.open(filename, "rb")
+  assert(f, err)
+  local data = f:read("*all")
+  f:close()
+  return data
+end
+
+local function write_file(filename, data)
+  local f, err = io.open(filename, "wb")
+  assert(f, err)
+  f:write(data)
+  f:close()
+end
+
+local function template(source, destination, args)
+  local f, err = io.open(source, "r")
+  assert(f, err)
+  local text = f:read("*all")
+  f:close()
+
+  text = text:gsub("${([a-zA-Z_][a-zA-Z_0-9]*)}", args)
+
+  f, err = io.open(destination, "w")
+  assert(f, err)
+  f:write(text)
+  f:close()
+end
+
+local function deep_clone(t)
+  if type(t) ~= "table" then
+    return t
+  end
+
+  local new_t = {}
+  for k, v in pairs(t) do
+    new_t[deep_clone(k)] = deep_clone(v)
+  end
+  return new_t
+end
+
+return {
+  read_file = read_file,
+  write_file = write_file,
+  template = template,
+  deep_clone = deep_clone,
+}

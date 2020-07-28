@@ -1,0 +1,29 @@
+local project = nil
+
+local function get_commit_hash()
+  local shell = require("deploy.lib.shell")
+  local commit = shell.read({ "git", "show", "-s", "--format=%H" }) or ""
+  return commit:match("^%s*(%S%S%S%S%S%S%S%S)")
+end
+
+local function read_project()
+  if project then return project end
+
+  local f, err = io.open("game.project", "r")
+  assert(f, err)
+  local project_str = f:read("*all")
+  f:close()
+
+  project = {
+    title = project_str:match("title = ([^\r\n]+)"),
+    version = project_str:match("version = ([^\r\n]+)"),
+    commit_hash = get_commit_hash(),
+  }
+  project.full_version = project.commit_hash
+    and project.version .. "." .. project.commit_hash
+    or project.version
+
+  return project
+end
+
+return read_project

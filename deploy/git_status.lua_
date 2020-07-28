@@ -1,0 +1,15 @@
+local shell = require("shell")
+
+local function check_git_status()
+  -- Test for git, since Lua 5.1 can't return the exit code of a popen()'d process
+  local ok, action, code = shell.execute({ "git", "diff", "--quiet", "HEAD..HEAD" })
+  if ok ~= 0 and not (ok == true and action == "exit" and code == 0) then
+    return false
+  end
+
+  -- Check unstaged files as well
+  local git_status = shell.read({ "git", "status", "--porcelain" })
+  return #git_status == 0
+end
+
+return check_git_status

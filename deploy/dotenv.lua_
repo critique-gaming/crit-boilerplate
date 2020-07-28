@@ -1,0 +1,43 @@
+local M = {}
+
+local BinaryFormat = package.cpath:match("%p[\\|/]?%p(%a+)")
+local os_name
+if BinaryFormat == "dll" then
+  os_name = "Windows"
+elseif BinaryFormat == "so" or BinaryFormat == "dylib" then
+  local f = io.popen("uname -s")
+  os_name = f:read()
+  f:close()
+end
+M.os_name = os_name
+
+local fs = require("path.fs")
+
+local env = {}
+
+local dotenv_path = ".deploy_env"
+if fs.isfile(dotenv_path) then
+  env = dofile(dotenv_path) or {}
+end
+
+function M.getenv(key)
+  local value = os.getenv(key)
+  if value == nil or value == "" then
+    value = env[key]
+  end
+  if value == "" then
+    value = nil
+  end
+  return value
+end
+
+function M.setenv(key, value)
+  env[key] = value
+end
+
+local VERBOSE = M.getenv("VERBOSE")
+M.verbose = VERBOSE and VERBOSE ~= "" and VERBOSE ~= "0" and VERBOSE ~= "false"
+
+M.env = env
+
+return M

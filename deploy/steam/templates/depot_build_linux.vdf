@@ -1,0 +1,19 @@
+"DepotBuildConfig"
+{
+  "DepotID" "${depot_id_linux}"
+  "ContentRoot" "linux/${title}"
+  "FileMapping"
+  {
+    "LocalPath" "*"
+    "DepotPath" "."
+    "recursive" "1"
+  }
+  "FileExclusion" ".DS_Store"
+  "FileExclusion" "thumbs.db"
+  "FileExclusion" "Thumbs.db"
+  "FileProperties"
+  {
+    "LocalPath" "${title}.x86_64"
+    "Attributes" "executable"
+  }
+}

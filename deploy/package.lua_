@@ -1,0 +1,41 @@
+local path = require("path")
+local read_project = require("deploy.project")
+local zip = require("deploy.zip")
+
+local filenames = {
+  windows = "_win.zip",
+  mac = "_macos.zip",
+  linux = "_linux.zip",
+  web = "_web.zip",
+  android = "_android.apk",
+  ios = "_ios.ipa",
+}
+
+local function package_build(platform, input_dir, output_dir)
+  print("Packaging for " .. platform .. "...")
+
+  local filename = filenames[platform]
+  if not filename then
+    error("Unsupported platform")
+  end
+
+  local project_title = read_project().title
+  filename = project_title .. filename
+
+  path.mkdir(output_dir)
+
+  local package_filename = path.join(output_dir, filename)
+  print("Packaging output: " .. package_filename)
+
+  if platform == "ios" then
+    path.copy(path.join(input_dir, project_title .. ".ipa"), package_filename)
+  elseif platform == "android" then
+    path.copy(path.join(input_dir, project_title, project_title .. ".apk"), package_filename)
+  elseif platform == "web" then
+    zip.create(path.join(input_dir, project_title), package_filename)
+  else
+    zip.create(input_dir, package_filename)
+  end
+end
+
+return package_build

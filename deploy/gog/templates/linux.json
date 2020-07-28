@@ -1,0 +1,43 @@
+{
+    "project": {
+        "baseProductId": "1500286266",
+        "clientId": "52605790530780419",
+        "clientSecret": "8f9cdbc58adaf24e36bd154b422fc34aea907028de3f6e1c48f149ca37e5cb88",
+        "version": "${full_version}",
+        "installDirectory": "${title}",
+        "name": "Interrogation: You Will Be Deceived",
+        "platform": "gnu-linux",
+        "tags": [
+            "editor_v_1_4_0"
+        ],
+        "languageMode": "together",
+        "products": [
+            {
+                "name": "${title}",
+                "productId": "1500286266",
+                "depots": [
+                    {
+                        "name": "main",
+                        "folder": "${build_dir}/linux/${title}",
+                        "languages": [
+                            "en-US"
+                        ]
+                    }
+                ],
+                "tasks": [
+                    {
+                        "type": "FileTask",
+                        "name": "${title}",
+                        "languages": [
+                            "en-US"
+                        ],
+                        "category": "game",
+                        "path": "${title}.x86_64",
+                        "isPrimary": true
+                    }
+                ],
+                "supportDepots": []
+            }
+        ]
+    }
+}
