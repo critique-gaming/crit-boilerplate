@@ -16,10 +16,14 @@ jobs:
         java-version: '11'
     - name: Setup Defold
       uses: dapetcu21/setup-defold@v1
-    - name: LuaJIT
+    - name: Setup LuaJIT
       uses: dapetcu21/gh-actions-lua@master
       with:
         luaVersion: 'luajit'
+    - name: Setup LuaRocks
+      uses: leafo/gh-actions-luarocks@v2
+    - name: Install LuaFileSystem
+      run: 'luarocks install luafilesystem'
     - name: Import Code-signing certs
       uses: apple-actions/import-codesign-certs@v1
       with: 
