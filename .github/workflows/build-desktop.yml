@@ -19,7 +19,7 @@ jobs:
     - name: Setup LuaJIT
       uses: leafo/gh-actions-lua@v6
       with:
-        luaVersion: "luajit-2.1.0-beta3"
+        luaVersion: '5.1'
     - name: Import Code-signing certs
       uses: apple-actions/import-codesign-certs@v1
       with: 
