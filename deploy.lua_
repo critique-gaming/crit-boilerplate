@@ -43,6 +43,7 @@ end
 
 local function build_options(cmd)
   cmd:flag("--debug", "Debug build. Release is default")
+  cmd:flag("--skip-resolve", "Skip dependency resolution")
   cmd:flag("--skip-git-status", "Skip checking if the project directory is clean before building")
   cmd:flag("--no-cleanup", "Doesn't reset the repo to its original state after building with bob")
   cmd:flag("--skip-texture-compression", "Skip texture compression")
