@@ -156,8 +156,10 @@ local function build(platform, output_dir, options)
   rmdir("build")
   rmdir(path.join(".internal", "cache"))
   rmdir(output_dir)
-
   path.mkdir(output_dir)
+
+  local project = read_project()
+  util.write_file(path.join(output_dir, "VERSION.txt"), project.full_version)
 
   local restore_game_project = edit_game_project(platform, options)
   local restore_env_lua = write_env_lua()
@@ -254,10 +256,9 @@ local function build(platform, output_dir, options)
   restore()
 
   if platform == "windows" then
-    local project_title = read_project().title
     pcall(function ()
       path.rename(
-        path.join(output_dir, project_title, "dmengine.pdb"),
+        path.join(output_dir, project.title, "dmengine.pdb"),
         path.join(output_dir, "dmengine.pdb")
       )
     end)
