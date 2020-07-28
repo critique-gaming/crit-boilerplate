@@ -38,7 +38,7 @@ local bank_paths = {
   switch = path.join("resources", "bundled", "nx64", "banks"),
 }
 
-local function edit_game_project(platform, options)
+local function edit_game_project(platform, options, complete_version)
   local game_project_path = "game.project"
 
   local project_str = util.read_file(game_project_path)
@@ -48,8 +48,7 @@ local function edit_game_project(platform, options)
     project_str = project_str:gsub("debug.appmanifest", "release.appmanifest")
   end
 
-  local version = (options.version or read_project().full_version) .. (options.version_suffix or "")
-  project_str = project_str:gsub("(version = [^\n]*)", "%1\nfull_version = " .. version)
+  project_str = project_str:gsub("(version = [^\n]*)", "%1\nfull_version = " .. complete_version)
 
   if options.version_code then
     project_str = project_str:gsub("version_code = [^\n]*", "version_code = " .. options.version_code)
@@ -159,9 +158,10 @@ local function build(platform, output_dir, options)
   path.mkdir(output_dir)
 
   local project = read_project()
-  util.write_file(path.join(output_dir, "VERSION.txt"), project.full_version)
+  local complete_version = (options.version or project.full_version) .. (options.version_suffix or "")
+  util.write_file(path.join(output_dir, "VERSION.txt"), complete_version)
 
-  local restore_game_project = edit_game_project(platform, options)
+  local restore_game_project = edit_game_project(platform, options, complete_version)
   local restore_env_lua = write_env_lua()
 
   local function restore()
