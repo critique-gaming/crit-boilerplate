@@ -23,10 +23,12 @@ end
 
 M.ensure_binaries = ensure_binaries
 
-function M.create(input_dir, output_file, path_levels)
+local tunpack = unpack or table.unpack
+
+function M.create(input_dir, output_file, path_levels, extra_args)
   ensure_binaries()
 
-  local out_handle = io.open(output_file, "wb")
+  local out_handle = assert(io.open(output_file, "wb"))
 
   local pwd = path.currentdir()
 
@@ -42,7 +44,9 @@ function M.create(input_dir, output_file, path_levels)
 
   path.chdir(current_dir)
 
-  local in_handle, err = io.popen(shell.escape({ M.zip_bin, "-r", "-", zipped_path or "." }, true), "r")
+  local in_handle, err = io.popen(shell.escape({
+    M.zip_bin, "-r", "-", zipped_path or ".", "-X", tunpack(extra_args or {})
+  }, true), "r")
   assert(in_handle, err)
   while true do
     local data = in_handle:read(4096)

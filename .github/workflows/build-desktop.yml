@@ -39,36 +39,18 @@ jobs:
         echo ::set-env name=APPLE_ID_PASSWORD::${{ secrets.APPLE_ID_PASSWORD }} &&
         echo ::set-env name=ASC_PROVIDER::${{ secrets.ASC_PROVIDER }}
     - name: Make debug builds
-      run: 'cd repo && lua deploy.lua_ build --debug --version-suffix .debug --skip-notarize'
-    - name: Archive macOS debug build
+      run: 'cd repo && lua deploy.lua_ package --debug --version-suffix .debug --skip-notarize'
+    - name: Archive debug builds
       uses: actions/upload-artifact@v2
       with:
-        name: debug-mac
-        path: repo/dist/build/mac
-    - name: Archive Windows debug build
-      uses: actions/upload-artifact@v2
-      with:
-        name: debug-windows
-        path: repo/dist/build/windows
-    - name: Archive Linux debug build
-      uses: actions/upload-artifact@v2
-      with:
-        name: debug-linux
-        path: repo/dist/build/linux
+        name: debug
+        path: repo/dist/package
+    - name: Cleanup package dir
+      run: rm -rf repo/dist/package
     - name: Make release builds
-      run: 'cd repo && lua deploy.lua_ build'
-    - name: Archive macOS release build
+      run: 'cd repo && lua deploy.lua_ package'
+    - name: Archive release builds
       uses: actions/upload-artifact@v2
       with:
-        name: release-mac
-        path: repo/dist/build/mac
-    - name: Archive Windows release build
-      uses: actions/upload-artifact@v2
-      with:
-        name: release-windows
-        path: repo/dist/build/windows
-    - name: Archive Linux release build
-      uses: actions/upload-artifact@v2
-      with:
-        name: release-linux
-        path: repo/dist/build/linux
+        name: release
+        path: repo/dist/package
