@@ -10,6 +10,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+      with:
+        path: 'repo'
     - name: Setup Java
       uses: actions/setup-java@v1
       with:
@@ -37,19 +39,19 @@ jobs:
         echo ::set-env name=APPLE_ID_PASSWORD::${{ secrets.APPLE_ID_PASSWORD }} &&
         echo ::set-env name=ASC_PROVIDER::${{ secrets.ASC_PROVIDER }}
     - name: Make release builds
-      run: 'lua deploy.lua_ build --skip-git-status'
+      run: 'cd repo && lua deploy.lua_ build --skip-git-status'
     - name: Archive macOS release build
       uses: actions/upload-artifact@v2
       with:
         name: release-mac
-        path: dist/build/mac
+        path: repo/dist/build/mac
     - name: Archive Windows release build
       uses: actions/upload-artifact@v2
       with:
         name: release-windows
-        path: dist/build/windows
+        path: repo/dist/build/windows
     - name: Archive Linux release build
       uses: actions/upload-artifact@v2
       with:
         name: release-linux
-        path: dist/build/linux
+        path: repo/dist/build/linux
