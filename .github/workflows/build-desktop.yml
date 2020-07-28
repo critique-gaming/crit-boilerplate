@@ -23,8 +23,8 @@ jobs:
     - name: Import Code-signing certs
       uses: apple-actions/import-codesign-certs@v1
       with: 
-        p12-file-base64: ${{ secrets.CERTIFICATES_P12 }}
-        p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
+        p12-file-base64: ${{ secrets.APPLE_CERTIFICATES_P12 }}
+        p12-password: ${{ secrets.APPLE_CERTIFICATES_P12_PASSWORD }}
     - name: Set environment variables
       run: > 
         echo ::set-env name=BOB::.defold/bob.jar &&
