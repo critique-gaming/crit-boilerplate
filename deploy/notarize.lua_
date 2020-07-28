@@ -48,7 +48,7 @@ local function notarize(app_path, options)
     return
   end
 
-  local bundle_id = read_project().title .. ".notarized." .. rng()
+  local bundle_id = read_project().title:gsub("[^a-zA-Z0-9]", "") .. ".notarized." .. rng()
   print("Notarizing app... (ID " .. bundle_id .. ")")
 
   local zip_path = app_path .. ".notarize.zip"
