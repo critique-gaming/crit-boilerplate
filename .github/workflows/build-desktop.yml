@@ -33,13 +33,13 @@ jobs:
         p12-password: ${{ secrets.APPLE_CERTIFICATES_P12_PASSWORD }}
     - name: Set environment variables
       run: > 
-        echo ::set-env name=BOB::.defold/bob.jar &&
+        echo ::set-env name=BOB::${GITHUB_WORKSPACE}/.defold/bob.jar &&
         echo ::set-env name=MAC_IDENTITY::${{ secrets.MAC_IDENTITY }} &&
         echo ::set-env name=APPLE_ID::${{ secrets.APPLE_ID }} &&
         echo ::set-env name=APPLE_ID_PASSWORD::${{ secrets.APPLE_ID_PASSWORD }} &&
         echo ::set-env name=ASC_PROVIDER::${{ secrets.ASC_PROVIDER }}
     - name: Make release builds
-      run: 'cd repo && lua deploy.lua_ build --skip-git-status'
+      run: 'cd repo && lua deploy.lua_ build'
     - name: Archive macOS release build
       uses: actions/upload-artifact@v2
       with:
