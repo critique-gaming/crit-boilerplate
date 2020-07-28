@@ -17,7 +17,7 @@ jobs:
     - name: Setup Defold
       uses: dapetcu21/setup-defold@v1
     - name: LuaJIT
-      uses: dapetcu21/gh-actions-lua
+      uses: dapetcu21/gh-actions-lua@master
       with:
         luaVersion: 'luajit'
     - name: Import Code-signing certs
