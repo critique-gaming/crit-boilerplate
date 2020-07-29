@@ -17,7 +17,7 @@ jobs:
       with:
         java-version: '11'
     - name: Setup Defold
-      uses: dapetcu21/setup-defold@v1
+      uses: dapetcu21/setup-defold@v2
     - name: Setup LuaJIT
       uses: dapetcu21/gh-actions-lua@master
       with:
@@ -33,7 +33,6 @@ jobs:
         p12-password: ${{ secrets.APPLE_CERTIFICATES_P12_PASSWORD }}
     - name: Set environment variables
       run: > 
-        echo ::set-env name=BOB::${GITHUB_WORKSPACE}/.defold/bob.jar &&
         echo ::set-env name=MAC_IDENTITY::${{ secrets.MAC_IDENTITY }} &&
         echo ::set-env name=APPLE_ID::${{ secrets.APPLE_ID }} &&
         echo ::set-env name=APPLE_ID_PASSWORD::${{ secrets.APPLE_ID_PASSWORD }} &&

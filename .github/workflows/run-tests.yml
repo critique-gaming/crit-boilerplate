@@ -15,11 +15,11 @@ jobs:
       with:
         java-version: '11'
     - name: Setup Defold
-      uses: dapetcu21/setup-defold@v1
+      uses: dapetcu21/setup-defold@v2
     - name: Resolve dependencies
-      run: 'java -jar .defold/bob.jar --auth "foobar" --email "john@doe.com" resolve'
+      run: 'java -jar $BOB --auth "foobar" --email "john@doe.com" resolve'
     - name: Build project
-      run: 'java -jar .defold/bob.jar --variant debug build --keep-unused'
+      run: 'java -jar $BOB --variant debug build --keep-unused'
     - name: Run tests
       run: 'dmengine_headless --config=bootstrap.main_collection=/test/test.collectionc'
     - name: Upload coverage to CodeCov
