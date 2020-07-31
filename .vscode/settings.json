@@ -123,5 +123,6 @@
         "assert_same",
         "assert_unique"
     ],
-    "Lua.runtime.version": "LuaJIT"
+    "Lua.runtime.version": "LuaJIT",
+    "files.eol": "\n"
 }
