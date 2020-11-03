@@ -1,5 +1,8 @@
 local Layout = require "crit.layout"
 local Button = require "crit.button"
+local DragAndDrop = require "crit.drag_and_drop"
+local ScrollBar = require "crit.scrollbar"
+local Scroll = require "crit.scroll"
 local dispatcher = require "crit.dispatcher"
 local transitions = require "monarch.transitions.gui"
 
@@ -47,6 +50,12 @@ function init(self)
 
   Button.default_sprite_action_to_position = Layout.action_to_projection
   Button.default_gui_action_to_position = Layout.action_to_offset_design
+  DragAndDrop.default_sprite_action_to_position = Layout.action_to_projection
+  DragAndDrop.default_gui_action_to_position = Layout.action_to_offset_design
+  ScrollBar.default_gui_action_to_position = Layout.action_to_offset_design
+  Scroll.default_go_action_to_dy = function (action)
+    return action.screen_dy * Layout.viewport_to_projection_scale_y
+  end
 
   self.view = vmath.matrix4()
 
