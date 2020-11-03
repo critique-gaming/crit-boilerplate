@@ -40,13 +40,13 @@ local lua_version do
 
 local lua_version_t
 lua_version = function()
-  if not lua_version_t then 
+  if not lua_version_t then
     local version = assert(_VERSION)
     local maj, min = version:match("^Lua (%d+)%.(%d+)$")
     if maj then                         lua_version_t = {tonumber(maj),tonumber(min)}
     elseif math.type    then            lua_version_t = {5,3}
     elseif not math.mod then            lua_version_t = {5,2}
-    elseif table.pack and not pack then lua_version_t = {5,2}
+    elseif table.pack and not _G.pack then lua_version_t = {5,2}
     else                                lua_version_t = {5,2} end
   end
   return lua_version_t[1], lua_version_t[2]
@@ -88,7 +88,7 @@ local CONST = {
   FILE_FLAG_DELETE_ON_CLOSE        = 0x04000000;
   FILE_FLAG_OVERLAPPED             = 0x40000000;
 
-  FILE_ATTRIBUTE_ARCHIVE             = 0x00000020; -- A file or directory that is an archive file or directory. Applications typically use this attribute to mark files for backup or removal . 
+  FILE_ATTRIBUTE_ARCHIVE             = 0x00000020; -- A file or directory that is an archive file or directory. Applications typically use this attribute to mark files for backup or removal .
   FILE_ATTRIBUTE_COMPRESSED          = 0x00000800; -- A file or directory that is compressed. For a file, all of the data in the file is compressed. For a directory, compression is the default for newly created files and subdirectories.
   FILE_ATTRIBUTE_DEVICE              = 0x00000040; -- This value is reserved for system use.
   FILE_ATTRIBUTE_DIRECTORY           = 0x00000010; -- The handle that identifies a directory.
@@ -268,93 +268,93 @@ local CONST = {
   LANG_UKRAINIAN                   = 0x22;
   LANG_VIETNAMESE                  = 0x2a;
 
-  SUBLANG_NEUTRAL                  = 0x00;    -- language neutral 
-  SUBLANG_DEFAULT                  = 0x01;    -- user default 
-  SUBLANG_SYS_DEFAULT              = 0x02;    -- system default 
+  SUBLANG_NEUTRAL                  = 0x00;    -- language neutral
+  SUBLANG_DEFAULT                  = 0x01;    -- user default
+  SUBLANG_SYS_DEFAULT              = 0x02;    -- system default
 
-  SUBLANG_ARABIC_SAUDI_ARABIA      = 0x01;    -- Arabic (Saudi Arabia) 
-  SUBLANG_ARABIC_IRAQ              = 0x02;    -- Arabic (Iraq) 
-  SUBLANG_ARABIC_EGYPT             = 0x03;    -- Arabic (Egypt) 
-  SUBLANG_ARABIC_LIBYA             = 0x04;    -- Arabic (Libya) 
-  SUBLANG_ARABIC_ALGERIA           = 0x05;    -- Arabic (Algeria) 
-  SUBLANG_ARABIC_MOROCCO           = 0x06;    -- Arabic (Morocco) 
-  SUBLANG_ARABIC_TUNISIA           = 0x07;    -- Arabic (Tunisia) 
-  SUBLANG_ARABIC_OMAN              = 0x08;    -- Arabic (Oman) 
-  SUBLANG_ARABIC_YEMEN             = 0x09;    -- Arabic (Yemen) 
-  SUBLANG_ARABIC_SYRIA             = 0x0a;    -- Arabic (Syria) 
-  SUBLANG_ARABIC_JORDAN            = 0x0b;    -- Arabic (Jordan) 
-  SUBLANG_ARABIC_LEBANON           = 0x0c;    -- Arabic (Lebanon) 
-  SUBLANG_ARABIC_KUWAIT            = 0x0d;    -- Arabic (Kuwait) 
-  SUBLANG_ARABIC_UAE               = 0x0e;    -- Arabic (U.A.E) 
-  SUBLANG_ARABIC_BAHRAIN           = 0x0f;    -- Arabic (Bahrain) 
-  SUBLANG_ARABIC_QATAR             = 0x10;    -- Arabic (Qatar) 
-  SUBLANG_CHINESE_TRADITIONAL      = 0x01;    -- Chinese (Taiwan Region) 
-  SUBLANG_CHINESE_SIMPLIFIED       = 0x02;    -- Chinese (PR China) 
-  SUBLANG_CHINESE_HONGKONG         = 0x03;    -- Chinese (Hong Kong) 
-  SUBLANG_CHINESE_SINGAPORE        = 0x04;    -- Chinese (Singapore) 
-  SUBLANG_CHINESE_MACAU            = 0x05;    -- Chinese (Macau) 
-  SUBLANG_DUTCH                    = 0x01;    -- Dutch 
-  SUBLANG_DUTCH_BELGIAN            = 0x02;    -- Dutch (Belgian) 
-  SUBLANG_ENGLISH_US               = 0x01;    -- English (USA) 
-  SUBLANG_ENGLISH_UK               = 0x02;    -- English (UK) 
-  SUBLANG_ENGLISH_AUS              = 0x03;    -- English (Australian) 
-  SUBLANG_ENGLISH_CAN              = 0x04;    -- English (Canadian) 
-  SUBLANG_ENGLISH_NZ               = 0x05;    -- English (New Zealand) 
-  SUBLANG_ENGLISH_EIRE             = 0x06;    -- English (Irish) 
-  SUBLANG_ENGLISH_SOUTH_AFRICA     = 0x07;    -- English (South Africa) 
-  SUBLANG_ENGLISH_JAMAICA          = 0x08;    -- English (Jamaica) 
-  SUBLANG_ENGLISH_CARIBBEAN        = 0x09;    -- English (Caribbean) 
-  SUBLANG_ENGLISH_BELIZE           = 0x0a;    -- English (Belize) 
-  SUBLANG_ENGLISH_TRINIDAD         = 0x0b;    -- English (Trinidad) 
-  SUBLANG_ENGLISH_ZIMBABWE         = 0x0c;    -- English (Zimbabwe) 
-  SUBLANG_ENGLISH_PHILIPPINES      = 0x0d;    -- English (Philippines) 
-  SUBLANG_FRENCH                   = 0x01;    -- French 
-  SUBLANG_FRENCH_BELGIAN           = 0x02;    -- French (Belgian) 
-  SUBLANG_FRENCH_CANADIAN          = 0x03;    -- French (Canadian) 
-  SUBLANG_FRENCH_SWISS             = 0x04;    -- French (Swiss) 
-  SUBLANG_FRENCH_LUXEMBOURG        = 0x05;    -- French (Luxembourg) 
-  SUBLANG_FRENCH_MONACO            = 0x06;    -- French (Monaco) 
-  SUBLANG_GERMAN                   = 0x01;    -- German 
-  SUBLANG_GERMAN_SWISS             = 0x02;    -- German (Swiss) 
-  SUBLANG_GERMAN_AUSTRIAN          = 0x03;    -- German (Austrian) 
-  SUBLANG_GERMAN_LUXEMBOURG        = 0x04;    -- German (Luxembourg) 
-  SUBLANG_GERMAN_LIECHTENSTEIN     = 0x05;    -- German (Liechtenstein) 
-  SUBLANG_ITALIAN                  = 0x01;    -- Italian 
-  SUBLANG_ITALIAN_SWISS            = 0x02;    -- Italian (Swiss) 
-  SUBLANG_KOREAN                   = 0x01;    -- Korean (Extended Wansung) 
-  SUBLANG_KOREAN_JOHAB             = 0x02;    -- Korean (Johab) 
-  SUBLANG_LITHUANIAN               = 0x01;    -- Lithuanian 
-  SUBLANG_LITHUANIAN_CLASSIC       = 0x02;    -- Lithuanian (Classic) 
-  SUBLANG_MALAY_MALAYSIA           = 0x01;    -- Malay (Malaysia) 
-  SUBLANG_MALAY_BRUNEI_DARUSSALAM  = 0x02;    -- Malay (Brunei Darussalam) 
-  SUBLANG_NORWEGIAN_BOKMAL         = 0x01;    -- Norwegian (Bokmal) 
-  SUBLANG_NORWEGIAN_NYNORSK        = 0x02;    -- Norwegian (Nynorsk) 
-  SUBLANG_PORTUGUESE               = 0x02;    -- Portuguese 
-  SUBLANG_PORTUGUESE_BRAZILIAN     = 0x01;    -- Portuguese (Brazilian) 
-  SUBLANG_SERBIAN_LATIN            = 0x02;    -- Serbian (Latin) 
-  SUBLANG_SERBIAN_CYRILLIC         = 0x03;    -- Serbian (Cyrillic) 
-  SUBLANG_SPANISH                  = 0x01;    -- Spanish (Castilian) 
-  SUBLANG_SPANISH_MEXICAN          = 0x02;    -- Spanish (Mexican) 
-  SUBLANG_SPANISH_MODERN           = 0x03;    -- Spanish (Modern) 
-  SUBLANG_SPANISH_GUATEMALA        = 0x04;    -- Spanish (Guatemala) 
-  SUBLANG_SPANISH_COSTA_RICA       = 0x05;    -- Spanish (Costa Rica) 
-  SUBLANG_SPANISH_PANAMA           = 0x06;    -- Spanish (Panama) 
-  SUBLANG_SPANISH_DOMINICAN_REPUBLIC = 0x07;  -- Spanish (Dominican Republic) 
-  SUBLANG_SPANISH_VENEZUELA        = 0x08;    -- Spanish (Venezuela) 
-  SUBLANG_SPANISH_COLOMBIA         = 0x09;    -- Spanish (Colombia) 
-  SUBLANG_SPANISH_PERU             = 0x0a;    -- Spanish (Peru) 
-  SUBLANG_SPANISH_ARGENTINA        = 0x0b;    -- Spanish (Argentina) 
-  SUBLANG_SPANISH_ECUADOR          = 0x0c;    -- Spanish (Ecuador) 
-  SUBLANG_SPANISH_CHILE            = 0x0d;    -- Spanish (Chile) 
-  SUBLANG_SPANISH_URUGUAY          = 0x0e;    -- Spanish (Uruguay) 
-  SUBLANG_SPANISH_PARAGUAY         = 0x0f;    -- Spanish (Paraguay) 
-  SUBLANG_SPANISH_BOLIVIA          = 0x10;    -- Spanish (Bolivia) 
-  SUBLANG_SPANISH_EL_SALVADOR      = 0x11;    -- Spanish (El Salvador) 
-  SUBLANG_SPANISH_HONDURAS         = 0x12;    -- Spanish (Honduras) 
-  SUBLANG_SPANISH_NICARAGUA        = 0x13;    -- Spanish (Nicaragua) 
-  SUBLANG_SPANISH_PUERTO_RICO      = 0x14;    -- Spanish (Puerto Rico) 
-  SUBLANG_SWEDISH                  = 0x01;    -- Swedish 
-  SUBLANG_SWEDISH_FINLAND          = 0x02;    -- Swedish (Finland) 
+  SUBLANG_ARABIC_SAUDI_ARABIA      = 0x01;    -- Arabic (Saudi Arabia)
+  SUBLANG_ARABIC_IRAQ              = 0x02;    -- Arabic (Iraq)
+  SUBLANG_ARABIC_EGYPT             = 0x03;    -- Arabic (Egypt)
+  SUBLANG_ARABIC_LIBYA             = 0x04;    -- Arabic (Libya)
+  SUBLANG_ARABIC_ALGERIA           = 0x05;    -- Arabic (Algeria)
+  SUBLANG_ARABIC_MOROCCO           = 0x06;    -- Arabic (Morocco)
+  SUBLANG_ARABIC_TUNISIA           = 0x07;    -- Arabic (Tunisia)
+  SUBLANG_ARABIC_OMAN              = 0x08;    -- Arabic (Oman)
+  SUBLANG_ARABIC_YEMEN             = 0x09;    -- Arabic (Yemen)
+  SUBLANG_ARABIC_SYRIA             = 0x0a;    -- Arabic (Syria)
+  SUBLANG_ARABIC_JORDAN            = 0x0b;    -- Arabic (Jordan)
+  SUBLANG_ARABIC_LEBANON           = 0x0c;    -- Arabic (Lebanon)
+  SUBLANG_ARABIC_KUWAIT            = 0x0d;    -- Arabic (Kuwait)
+  SUBLANG_ARABIC_UAE               = 0x0e;    -- Arabic (U.A.E)
+  SUBLANG_ARABIC_BAHRAIN           = 0x0f;    -- Arabic (Bahrain)
+  SUBLANG_ARABIC_QATAR             = 0x10;    -- Arabic (Qatar)
+  SUBLANG_CHINESE_TRADITIONAL      = 0x01;    -- Chinese (Taiwan Region)
+  SUBLANG_CHINESE_SIMPLIFIED       = 0x02;    -- Chinese (PR China)
+  SUBLANG_CHINESE_HONGKONG         = 0x03;    -- Chinese (Hong Kong)
+  SUBLANG_CHINESE_SINGAPORE        = 0x04;    -- Chinese (Singapore)
+  SUBLANG_CHINESE_MACAU            = 0x05;    -- Chinese (Macau)
+  SUBLANG_DUTCH                    = 0x01;    -- Dutch
+  SUBLANG_DUTCH_BELGIAN            = 0x02;    -- Dutch (Belgian)
+  SUBLANG_ENGLISH_US               = 0x01;    -- English (USA)
+  SUBLANG_ENGLISH_UK               = 0x02;    -- English (UK)
+  SUBLANG_ENGLISH_AUS              = 0x03;    -- English (Australian)
+  SUBLANG_ENGLISH_CAN              = 0x04;    -- English (Canadian)
+  SUBLANG_ENGLISH_NZ               = 0x05;    -- English (New Zealand)
+  SUBLANG_ENGLISH_EIRE             = 0x06;    -- English (Irish)
+  SUBLANG_ENGLISH_SOUTH_AFRICA     = 0x07;    -- English (South Africa)
+  SUBLANG_ENGLISH_JAMAICA          = 0x08;    -- English (Jamaica)
+  SUBLANG_ENGLISH_CARIBBEAN        = 0x09;    -- English (Caribbean)
+  SUBLANG_ENGLISH_BELIZE           = 0x0a;    -- English (Belize)
+  SUBLANG_ENGLISH_TRINIDAD         = 0x0b;    -- English (Trinidad)
+  SUBLANG_ENGLISH_ZIMBABWE         = 0x0c;    -- English (Zimbabwe)
+  SUBLANG_ENGLISH_PHILIPPINES      = 0x0d;    -- English (Philippines)
+  SUBLANG_FRENCH                   = 0x01;    -- French
+  SUBLANG_FRENCH_BELGIAN           = 0x02;    -- French (Belgian)
+  SUBLANG_FRENCH_CANADIAN          = 0x03;    -- French (Canadian)
+  SUBLANG_FRENCH_SWISS             = 0x04;    -- French (Swiss)
+  SUBLANG_FRENCH_LUXEMBOURG        = 0x05;    -- French (Luxembourg)
+  SUBLANG_FRENCH_MONACO            = 0x06;    -- French (Monaco)
+  SUBLANG_GERMAN                   = 0x01;    -- German
+  SUBLANG_GERMAN_SWISS             = 0x02;    -- German (Swiss)
+  SUBLANG_GERMAN_AUSTRIAN          = 0x03;    -- German (Austrian)
+  SUBLANG_GERMAN_LUXEMBOURG        = 0x04;    -- German (Luxembourg)
+  SUBLANG_GERMAN_LIECHTENSTEIN     = 0x05;    -- German (Liechtenstein)
+  SUBLANG_ITALIAN                  = 0x01;    -- Italian
+  SUBLANG_ITALIAN_SWISS            = 0x02;    -- Italian (Swiss)
+  SUBLANG_KOREAN                   = 0x01;    -- Korean (Extended Wansung)
+  SUBLANG_KOREAN_JOHAB             = 0x02;    -- Korean (Johab)
+  SUBLANG_LITHUANIAN               = 0x01;    -- Lithuanian
+  SUBLANG_LITHUANIAN_CLASSIC       = 0x02;    -- Lithuanian (Classic)
+  SUBLANG_MALAY_MALAYSIA           = 0x01;    -- Malay (Malaysia)
+  SUBLANG_MALAY_BRUNEI_DARUSSALAM  = 0x02;    -- Malay (Brunei Darussalam)
+  SUBLANG_NORWEGIAN_BOKMAL         = 0x01;    -- Norwegian (Bokmal)
+  SUBLANG_NORWEGIAN_NYNORSK        = 0x02;    -- Norwegian (Nynorsk)
+  SUBLANG_PORTUGUESE               = 0x02;    -- Portuguese
+  SUBLANG_PORTUGUESE_BRAZILIAN     = 0x01;    -- Portuguese (Brazilian)
+  SUBLANG_SERBIAN_LATIN            = 0x02;    -- Serbian (Latin)
+  SUBLANG_SERBIAN_CYRILLIC         = 0x03;    -- Serbian (Cyrillic)
+  SUBLANG_SPANISH                  = 0x01;    -- Spanish (Castilian)
+  SUBLANG_SPANISH_MEXICAN          = 0x02;    -- Spanish (Mexican)
+  SUBLANG_SPANISH_MODERN           = 0x03;    -- Spanish (Modern)
+  SUBLANG_SPANISH_GUATEMALA        = 0x04;    -- Spanish (Guatemala)
+  SUBLANG_SPANISH_COSTA_RICA       = 0x05;    -- Spanish (Costa Rica)
+  SUBLANG_SPANISH_PANAMA           = 0x06;    -- Spanish (Panama)
+  SUBLANG_SPANISH_DOMINICAN_REPUBLIC = 0x07;  -- Spanish (Dominican Republic)
+  SUBLANG_SPANISH_VENEZUELA        = 0x08;    -- Spanish (Venezuela)
+  SUBLANG_SPANISH_COLOMBIA         = 0x09;    -- Spanish (Colombia)
+  SUBLANG_SPANISH_PERU             = 0x0a;    -- Spanish (Peru)
+  SUBLANG_SPANISH_ARGENTINA        = 0x0b;    -- Spanish (Argentina)
+  SUBLANG_SPANISH_ECUADOR          = 0x0c;    -- Spanish (Ecuador)
+  SUBLANG_SPANISH_CHILE            = 0x0d;    -- Spanish (Chile)
+  SUBLANG_SPANISH_URUGUAY          = 0x0e;    -- Spanish (Uruguay)
+  SUBLANG_SPANISH_PARAGUAY         = 0x0f;    -- Spanish (Paraguay)
+  SUBLANG_SPANISH_BOLIVIA          = 0x10;    -- Spanish (Bolivia)
+  SUBLANG_SPANISH_EL_SALVADOR      = 0x11;    -- Spanish (El Salvador)
+  SUBLANG_SPANISH_HONDURAS         = 0x12;    -- Spanish (Honduras)
+  SUBLANG_SPANISH_NICARAGUA        = 0x13;    -- Spanish (Nicaragua)
+  SUBLANG_SPANISH_PUERTO_RICO      = 0x14;    -- Spanish (Puerto Rico)
+  SUBLANG_SWEDISH                  = 0x01;    -- Swedish
+  SUBLANG_SWEDISH_FINLAND          = 0x02;    -- Swedish (Finland)
 
 
   -- The system cannot find the file specified.
@@ -505,7 +505,7 @@ end
 
 function _M.exists(u, P)
   local fd, err = u.GetFileAttributesEx(P)
-  if not fd then 
+  if not fd then
     if file_not_found(err) then return false end
     return nil, err
   end
@@ -514,7 +514,7 @@ end
 
 function _M.isdir(u, P)
   local fd, err = u.GetFileAttributesEx(P)
-  if not fd then 
+  if not fd then
     if file_not_found(err) then return false end
     return nil, err
   end
@@ -524,7 +524,7 @@ end
 
 function _M.isfile(u, P)
   local fd, err = u.GetFileAttributesEx(P)
-  if not fd then 
+  if not fd then
     if file_not_found(err) then return false end
     return nil, err
   end
@@ -534,7 +534,7 @@ end
 
 function _M.islink(u, P)
   local fd, err = u.GetFileAttributesEx(P)
-  if not fd then 
+  if not fd then
     if file_not_found(err) then return false end
     return nil, err
   end
@@ -648,7 +648,7 @@ function _M.touch(u, P, at, mt)
   if not mt then mt = at end
   local atime = {TimeTToFileTime(at)}
   local mtime = {TimeTToFileTime(mt)}
-  local h, err = u.CreateFile(P, 
+  local h, err = u.CreateFile(P,
     CONST.GENERIC_READ + CONST.FILE_WRITE_ATTRIBUTES,
     CONST.FILE_SHARE_READ + CONST.FILE_SHARE_WRITE, nil,
     CONST.OPEN_EXISTING, CONST.FILE_ATTRIBUTE_NORMAL, nil
@@ -721,7 +721,7 @@ foreach_impl = function (u, base, mask, callback, option)
 
   local tmp, origin_cb
   if option.delay then
-    tmp, origin_cb, callback = {}, callback, function(base,name,fd) 
+    tmp, origin_cb, callback = {}, callback, function(base,name,fd)
       table.insert(tmp, {base,name,fd})
     end;
   end
@@ -777,7 +777,7 @@ local attribs = {
 
 local function make_attrib(str)
   local t = {}
-  for i = 1, #str do 
+  for i = 1, #str do
     local ch = str:sub(i,i)
     local fn = attribs[ ch ]
     if not fn then return nil, 'unknown file attribute: ' .. ch end
@@ -807,7 +807,7 @@ function _M.each_impl(u, option)
   local filter = option.filter
 
   if option.callback then
-    local callback = option.callback 
+    local callback = option.callback
 
     local function cb(base, name, path, fd)
       local params = assert(get_params(u, base, name, path, fd))
@@ -845,7 +845,7 @@ local function load(ltype, sub)
     DIR_SEP = IMPL.DIR_SEP;
   }
   for k, v in pairs(_M) do
-    if type(v) ~= "function" then M[k] = v 
+    if type(v) ~= "function" then M[k] = v
     else M[k] = function(...) return v(IMPL, ...) end end
   end
   local each_impl = _M.each_impl
