@@ -1,6 +1,7 @@
 {
     "recommendations": [
         "sumneko.lua",
+        "rog2.luacheck",
         "thesofakillers.vscode-pbtxt",
         "slevesque.shader",
         "naumovs.color-highlight"
