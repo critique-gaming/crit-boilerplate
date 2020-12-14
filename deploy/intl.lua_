@@ -10,6 +10,20 @@ local function trim_final_newlines(intl_data)
   end
 end
 
+local function split(s, pattern)
+  return coroutine.wrap(function ()
+    local last_end
+    local pat = "(.-)" .. pattern
+    while true do
+      local start, end_, capture = s:find(pat, last_end)
+      if not start then break end
+      coroutine.yield(capture)
+      last_end = end_ + 1
+    end
+    coroutine.yield(s:sub((last_end or 0) + 1))
+  end)
+end
+
 local function parse(format, data)
   if format == "lua" then
     local reference_data = assert((loadstring or load)(data))()
@@ -17,7 +31,8 @@ local function parse(format, data)
     local parsed_keys = {}
     local intl_data = {}
 
-    for line in data:gmatch("[^\r\n]*") do
+    data = data:gsub("\r\n", "\n")
+    for line in split(data, "\n") do
       local chunk = (loadstring or load)("return { " .. line .. " }")
       if chunk then
         local ok, tmp_table = pcall(chunk)
