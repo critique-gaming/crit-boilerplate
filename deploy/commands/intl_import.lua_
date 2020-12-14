@@ -1,0 +1,15 @@
+local M = {}
+
+M.id = "intl_import"
+
+function M.parser_config(parser)
+  local cmd = parser:command("intl_import", "Import intl strings into the game")
+  cmd:argument("input_path", "Path to a file or directory of intl files")
+end
+
+function M.run(args)
+  local intl_cmd = require("deploy.intl_cmd")
+  intl_cmd.import(args.input_path)
+end
+
+return M

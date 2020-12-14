@@ -9,14 +9,13 @@ end
 local function read_project()
   if project then return project end
 
-  local f, err = io.open("game.project", "r")
-  assert(f, err)
-  local project_str = f:read("*all")
-  f:close()
+  local inifile = require("inifile")
+  local ini = inifile.parse("game.project")
 
   project = {
-    title = project_str:match("title = ([^\r\n]+)"),
-    version = project_str:match("version = ([^\r\n]+)"),
+    ini = ini,
+    title = ini.project.title,
+    version = ini.project.version,
     commit_hash = get_commit_hash(),
   }
   project.full_version = project.commit_hash

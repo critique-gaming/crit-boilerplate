@@ -1,0 +1,16 @@
+local M = {}
+
+M.id = "intl_export"
+
+function M.parser_config(parser)
+  local cmd = parser:command("intl_export", "Export all intl strings from the game")
+  cmd:argument("out_dir", "Path where the files will be exported")
+  cmd:option("--format", "Output format. One of: lua, csv", "lua")
+end
+
+function M.run(args)
+  local intl_cmd = require("deploy.intl_cmd")
+  intl_cmd.export(args.format, args.out_dir)
+end
+
+return M

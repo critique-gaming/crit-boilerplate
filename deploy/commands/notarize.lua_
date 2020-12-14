@@ -1,0 +1,41 @@
+local M = {}
+
+M.id = "cmd_notarize"
+
+function M.arg_config(cmd)
+  local dotenv = require("deploy.dotenv")
+  cmd:option("--apple-id", "Apple ID username", dotenv.getenv("APPLE_ID"))
+  cmd:option("--apple-id-password", "Apple ID password", dotenv.getenv("APPLE_ID_PASSWORD"))
+  cmd:option("--asc-provider", "Your short Apple Developer Account team ID", dotenv.getenv("ASC_PROVIDER"))
+end
+
+function M.parser_config(parser)
+  local cmd = parser:command("notarize", "Notarize the macOS build of the game"):target("cmd_notarize")
+  cmd:argument("app_path",
+    "Path to the .app. Omit to notarize the default mac build"
+  ):args("?")
+  cmd:option("--request-uuid",
+    "Skip notarization upload and just wait for an existing notarization request to finish instead."
+  )
+  cmd:flag("--just-staple", "Skip upoading and waiting. Just staple the notarization token to the app.")
+  M.arg_config(cmd)
+end
+
+function M.run(args)
+  local notarize = require("deploy.notarize")
+  local path = require("path")
+
+  local app_path = args.app_path
+  if not app_path then
+    local read_project = require("deploy.project")
+    app_path = path.join("dist", "build", "mac", read_project().title .. ".app")
+  end
+
+  if not args.just_staple then
+    local request_uuid = args.request_uuid or notarize.notarize(app_path, args)
+    notarize.wait(request_uuid, args)
+  end
+  notarize.staple(app_path)
+end
+
+return M

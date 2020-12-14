@@ -44,7 +44,8 @@ local function steam_upload(branch, build_dir, options)
     end
 
     if notarization_request_uuid then
-      notarize.staple(notarization_request_uuid, mac_app_path, options)
+      notarize.wait(notarization_request_uuid, options)
+      notarize.staple(mac_app_path)
     end
   end
 

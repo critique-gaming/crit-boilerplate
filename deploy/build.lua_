@@ -4,6 +4,8 @@ local util = require("deploy.util")
 local shell = require("shell")
 local read_project = require("deploy.project")
 local dotenv = require("deploy.dotenv")
+local api = require("deploy.api")
+local inifile = require("inifile")
 
 local platforms = {
   mac = "x86_64-darwin",
@@ -29,60 +31,56 @@ local function rmdir(p)
   end)
 end
 
-local bank_paths = {
-  windows = path.join("resources", "bundled", "win32", "banks"),
-  mac = path.join("resources", "bundled", "osx", "Contents", "Resources", "banks"),
-  linux = path.join("resources", "bundled", "linux", "banks"),
-  ios = path.join("resources", "bundled", "ios", "banks"),
-  android = path.join("resources", "bundled", "android", "assets", "banks"),
-  switch = path.join("resources", "bundled", "nx64", "banks"),
-}
+local function set_ini(ini, category, key, value)
+  ini[category] = ini[category] or {}
+  ini[category][key] = value
+end
 
-local function edit_game_project(platform, options, complete_version)
-  local game_project_path = "game.project"
+local function edit_game_project(context)
+  local options = context.options
+  local project = context.project
+  local platform = context.platform
 
-  local project_str = util.read_file(game_project_path)
-  local original_project_str = project_str
+  local overrides = {}
+  local ini = project.ini
 
-  if not options.debug then
-    project_str = project_str:gsub("debug.appmanifest", "release.appmanifest")
+  set_ini(overrides, "crit", "bundled", 1)
+
+  if not options.debug and ini.native_extension and ini.native_extension.app_manifest == "debug.appmanifest" then
+    set_ini(overrides, "native_extension", "app_manifest", "release.app_manifest")
   end
 
-  project_str = project_str:gsub("(version = [^\n]*)", "%1\nfull_version = " .. complete_version)
+  set_ini(overrides, "project", "version", context.versions.version)
+  set_ini(overrides, "project", "full_version", context.versions.full_version)
 
   if options.version_code then
-    project_str = project_str:gsub("version_code = [^\n]*", "version_code = " .. options.version_code)
-    project_str = project_str:gsub("build_number = [^\n]*", "build_number = " .. options.version_code)
+    set_ini(overrides, "android", "version_code", options.version_code)
+    set_ini(overrides, "ios", "build_number", options.version_code)
   end
 
   if options.skip_texture_compression then
-    project_str = project_str:gsub(
-      "texture_profiles = [^\n]*",
-      "texture_profiles = /builtins/graphics/default.texture_profiles"
-    )
+    set_ini(overrides, "graphics", "texture_profiles", "/builtins/graphics/default.texture_profiles")
   end
 
   if options.apkx_patch_version or options.apkx_main_version then
-    project_str = project_str .. "\n\n[apkx]\n"
     if options.apkx_main_version then
-      project_str = project_str .. "main_version" .. options.apkx_main_version .. "\n"
+      set_ini(overrides, "apkx", "main_version", options.apkx_main_version)
     end
     if options.apkx_patch_version then
-      project_str = project_str .. "patch_version" .. options.apkx_patch_version .. "\n"
+      set_ini(overrides, "apkx", "patch_version", options.apkx_patch_version)
     end
   end
 
-  project_str = bob.inject_dependencies_string(project_str, bob.get_platform_dependencies(options, platform))
+  set_ini(overrides, "project", "dependencies", bob.modify_dependencies_string(
+    ini.project and ini.project.dependencies or "",
+    bob.get_platform_dependencies(options, platform)
+  ))
 
-  local project_changed = project_str ~= original_project_str
-  if project_changed then
-    util.write_file(game_project_path, project_str)
-  end
+  api.run_hook("build:game_project", overrides, context)
 
+  inifile.save(context.overrides_file, overrides)
   return function ()
-    if project_changed then
-      util.write_file(game_project_path, original_project_str)
-    end
+    os.remove(context.overrides_file)
   end
 end
 
@@ -144,6 +142,18 @@ local function codesign(platform, output_dir, options)
   return app_path
 end
 
+local function resolve_versions(options)
+  local project = read_project()
+  local version = options.version or project.version
+  local full_version = (project.commit_hash
+    and version .. "." .. project.commit_hash
+    or version) .. (options.version_suffix or "")
+  return {
+    version = version,
+    full_version = full_version,
+  }
+end
+
 local function build(platform, output_dir, options)
   print("Building for " .. platform .. "...")
 
@@ -157,12 +167,22 @@ local function build(platform, output_dir, options)
   rmdir(output_dir)
   path.mkdir(output_dir)
 
-  local project = read_project()
-  local complete_version = (options.version or project.full_version) .. (options.version_suffix or "")
-  util.write_file(path.join(output_dir, "VERSION.txt"), complete_version)
+  local resolved_versions = resolve_versions(options)
+  util.write_file(path.join(output_dir, "VERSION.txt"), resolved_versions.full_version)
 
-  local restore_game_project = edit_game_project(platform, options, complete_version)
+  local project = read_project()
+  local context = {
+    options = options,
+    project = project,
+    versions = resolved_versions,
+    platform = platform,
+    output_dir = output_dir,
+    overrides_file = path.join(output_dir, "deploy_overrides.ini"),
+  }
+
+  local restore_game_project = edit_game_project(context)
   local restore_env_lua = write_env_lua()
+  local to_cleanup = api.run_hook("build:prepare", context)
 
   local function restore()
     if options.no_cleanup then
@@ -173,6 +193,12 @@ local function build(platform, output_dir, options)
       return
     end
 
+    for i = to_cleanup.n, 1, -1 do
+      local f = to_cleanup[i]
+      if f then
+        f()
+      end
+    end
     restore_env_lua()
     restore_game_project()
   end
@@ -199,12 +225,14 @@ local function build(platform, output_dir, options)
   end
 
   if platform == "ios" then
-    assert(options.ios_identity, "--ios-identity is required for iOS builds")
-    assert(options.ios_provisioning, "--ios-provisioning is required for iOS builds")
-    table.insert(bob_args, "--identity")
-    table.insert(bob_args, options.ios_identity)
-    table.insert(bob_args, "--mobileprovisioning")
-    table.insert(bob_args, options.ios_provisioning)
+    if options.ios_identity and options.ios_provisioning then
+      table.insert(bob_args, "--identity")
+      table.insert(bob_args, options.ios_identity)
+      table.insert(bob_args, "--mobileprovisioning")
+      table.insert(bob_args, options.ios_provisioning)
+    else
+      print("WARNING! You did not provide a code signing identity or provisioning profile. Your iOS buid will be unsigned!")
+    end
   end
 
   if platform == "android" then
@@ -229,6 +257,9 @@ local function build(platform, output_dir, options)
     table.insert(bob_args, "--strip-executable")
   end
 
+  table.insert(bob_args, "--settings")
+  table.insert(bob_args, context.overrides_file)
+
   if platform == "switch" then
     table.insert(bob_args, "--settings")
     table.insert(bob_args, "switch.ini")
@@ -243,6 +274,8 @@ local function build(platform, output_dir, options)
     table.insert(bob_args, "--settings")
     table.insert(bob_args, "gog.ini")
   end
+
+  api.run_hook("build:args", bob_args, context)
 
   local ok, error_msg = pcall(function ()
     bob.run(bob_args)

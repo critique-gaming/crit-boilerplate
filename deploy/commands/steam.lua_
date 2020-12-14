@@ -1,0 +1,49 @@
+local M = {}
+
+M.id = "cmd_steam"
+
+local cmd_build = require "deploy.commands.build"
+
+function M.parser_config(parser)
+  local dotenv = require("deploy.dotenv")
+  local cmd = parser:command("steam", "Build and upload game to Steam"):target("cmd_steam")
+  cmd:argument("branch", "The branch to build to. Omit to build all branches" ):args("?")
+  cmd:flag("--skip-build", "Skip building (just upload)")
+  cmd:option("-bo --build-output", "Build output directory")
+  cmd_build.arg_config(cmd)
+  cmd:option("--steamcmd", "Path to steamcmd", dotenv.getenv("STEAMCMD"))
+  cmd:option("--steam-user", "Steam account ID", dotenv.getenv("STEAM_USER"))
+  cmd:option("--steam-password", "Steam account password")
+  cmd:flag("--test-login", "Skip building and only test Steam login")
+  cmd:flag("--preview", "Simulate uploading and generate depot reports")
+  cmd_build.arg_config_mac(cmd)
+end
+
+function M.run(args)
+  cmd_build.setup(args)
+
+  if not args.skip_resolve and not args.skip_build and not args.test_login then
+    local bob = require("deploy.bob")
+    bob.resolve({ steam = true })
+  end
+
+  local dotenv = require("deploy.dotenv")
+  args.steam_password = args.steam_password or dotenv.getenv("STEAM_PASSWORD")
+
+  local steam = require("deploy.steam")
+
+  if args.test_login then
+    steam.steam_login(args)
+    return
+  end
+
+  local path = require("path")
+  if args.branch then
+    local build_dir = args.build_output or path.join("dist", "steam", args.branch)
+    steam.steam_upload(args.branch, build_dir, args)
+  else
+    steam.steam_upload_all(path.join("dist", "steam"), args)
+  end
+end
+
+return M

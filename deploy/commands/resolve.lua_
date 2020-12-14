@@ -1,0 +1,22 @@
+local M = {}
+
+M.id = "cmd_resolve"
+
+function M.arg_config(cmd)
+  require("deploy.commands.bob").arg_config(cmd)
+  local dotenv = require("deploy.dotenv")
+  cmd:option("--defoldsdk", "Hash to a particular DefoldSDK version", dotenv.getenv("DEFOLDSDK"))
+end
+
+function M.parser_config(parser)
+  local cmd = parser:command("resolve", "Fetch dependencies"):target("cmd_resolve")
+  M.arg_config(cmd)
+end
+
+function M.run(args)
+  require("deploy.commands.bob").setup(args)
+  local bob = require("deploy.bob")
+  bob.resolve()
+end
+
+return M

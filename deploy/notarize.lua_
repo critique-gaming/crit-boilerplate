@@ -92,7 +92,7 @@ local function notarize(app_path, options)
   return request_uuid
 end
 
-local function staple(request_uuid, app_path, options)
+local function wait(request_uuid, options)
   if not request_uuid then
     return
   end
@@ -129,18 +129,25 @@ local function staple(request_uuid, app_path, options)
     shell.pexecute({"sleep", "30"})
   end
 
-  if final_status == "success" then
-    print("Stapling notarization ticket to app...")
-    shell.pexecute({ "xcrun", "stapler", "staple", app_path })
+  if final_status ~= "success" then
+    error("Notarization failed with status " .. final_status)
   end
 end
 
+local function staple(app_path)
+  print("Stapling notarization ticket to app...")
+  shell.pexecute({ "xcrun", "stapler", "staple", app_path })
+end
+
 local function notarize_and_staple(app_path, options)
-  staple(notarize(app_path, options), app_path, options)
+  local request_uuid = notarize(app_path, options)
+  wait(request_uuid, options)
+  staple(app_path)
 end
 
 return {
   notarize = notarize,
+  wait = wait,
   staple = staple,
   notarize_and_staple = notarize_and_staple,
 }

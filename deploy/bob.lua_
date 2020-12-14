@@ -2,6 +2,7 @@ local dotenv = require("deploy.dotenv")
 local util = require("deploy.util")
 local shell = require("shell")
 local path = require("path")
+local api = require("deploy.api")
 
 local java_home = dotenv.getenv("JAVA_HOME")
 local java_home_override = dotenv.env["JAVA_HOME"]
@@ -47,6 +48,8 @@ local per_platform_removed_dependencies = {
   android = { "subsoap/defos" },
 }
 
+api.run_hook("resolve:per_platform_removed_dependencies", per_platform_removed_dependencies)
+
 function M.get_platform_dependencies(opts, platform)
   -- Add any dependency you want to add depending on platform or options
   local additional_deps = {}
@@ -65,36 +68,40 @@ function M.get_platform_dependencies(opts, platform)
 
   local removed_deps = per_platform_removed_dependencies[platform]
 
-  return additional_deps, removed_deps
+  return api.reduce_hook("resolve:per_platform_dependencies", additional_deps, removed_deps)
 end
 
-function M.inject_dependencies_string(project_str, additional_deps, removed_deps)
+function M.modify_dependencies_string(deps_string, additional_deps, removed_deps)
+  deps_string = deps_string or ""
+
   if removed_deps and next(removed_deps) then
-    project_str = project_str:gsub("(dependencies = )([^\n%s]*)", function (match_start, deps_string)
-      local deps = {}
-      for dep in deps_string:gmatch('[^,]+') do
-        local removed = false
-        for _, item in ipairs(removed_deps) do
-          if dep:match(item) then
-            removed = true
-            break
-          end
-        end
-        if not removed then
-          deps[#deps + 1] = dep
+    local deps = {}
+    for dep in deps_string:gmatch('[^,]+') do
+      local removed = false
+      for _, item in ipairs(removed_deps) do
+        if dep:match(item) then
+          removed = true
+          break
         end
       end
-      return match_start .. table.concat(deps, ",")
-    end)
+      if not removed then
+        deps[#deps + 1] = dep
+      end
+    end
+    deps_string = deps_string .. table.concat(deps, ",")
   end
 
   if additional_deps and next(additional_deps) then
-    project_str = project_str:gsub("dependencies = [^\n%s]*", function (deps)
-      return deps .. "," .. table.concat(additional_deps, ",")
-    end)
+    deps_string = table.concat({ deps_string, (unpack or table.unpack)(additional_deps) }, ",")
   end
 
-  return project_str
+  return deps_string
+end
+
+function M.inject_dependencies_string(project_str, additional_deps, removed_deps)
+  return project_str:gsub("(dependencies = )([^\n%s]*)", function (match_start, deps_string)
+    return match_start .. M.modify_dependencies_string(deps_string, additional_deps, removed_deps)
+  end)
 end
 
 function M.inject_dependencies(additional_deps, removed_deps)

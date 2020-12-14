@@ -1,0 +1,67 @@
+local M = {}
+
+local commands = {}
+M.commands = commands
+
+local unpack = unpack or table.unpack
+
+function M.register_command(cmd)
+  assert(type(cmd.id) == "string", "Command must have a string \"id\" field")
+  if commands[cmd.id] then
+    error("Command \"" .. cmd.id .. "\" already registered")
+  end
+  commands[cmd.id] = cmd
+  commands[#commands + 1] = cmd.id
+end
+
+local hooks = {{}}
+local hook_level = 1
+
+function M.hook_closure(f)
+  hook_level = hook_level + 1
+  hooks[hook_level] = {}
+  f()
+  hooks[hook_level] = nil
+  hook_level = hook_level - 1
+end
+
+function M.register_hook(hook_id, hook_func)
+  local current_hooks = hooks[hook_level]
+  local ha = current_hooks[hook_id]
+  if not ha then
+    ha = {}
+    current_hooks[hook_id] = ha
+  end
+  ha[#ha + 1] = hook_func
+end
+
+function M.run_hook(hook_id, ...)
+  local results = {}
+  local results_len = 0
+  for level = 1, hook_level do
+    local ha = hooks[level][hook_id]
+    if ha then
+      for i = 1, #ha do
+        results_len = results_len + 1
+        results[results_len] = ha[i](...)
+      end
+    end
+  end
+  results.n = results_len
+  return results
+end
+
+function M.reduce_hook(hook_id, ...)
+  local value = { ... }
+  for level = 1, hook_level do
+    local ha = hooks[level][hook_id]
+    if ha then
+      for i = 1, #ha do
+        value = { ha[i](unpack(value)) }
+      end
+    end
+  end
+  return unpack(value)
+end
+
+return M

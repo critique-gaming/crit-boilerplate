@@ -1,0 +1,62 @@
+local M = {}
+
+M.id = "cmd_bob"
+
+function M.arg_config(cmd)
+  cmd:option("--bob", "Path to bob.jar"):count('?')
+  cmd:option("--java-home", "Override path to JAVA_HOME, if necessary"):count('?')
+end
+
+function M.setup(args)
+  local dotenv = require("deploy.dotenv")
+  if args.bob then
+    dotenv.setenv("BOB", args.bob)
+  end
+  if args.java_home then
+    dotenv.setenv("JAVA_HOME", args.java_home)
+  end
+end
+
+function M.parser_config(parser)
+  local cmd = parser:command("bob", "Invoke bob.jar manually"):target("cmd_bob")
+  M.arg_config(cmd)
+  cmd:flag("--bob-help", "Invoke bob.jar --help"):count('?')
+end
+
+function M.custom_parse(parser, args)
+  local parsed_args = {}
+  local best_index = -1
+  local best_args
+
+  for i = 1, #args do
+    parsed_args[i] = args[i]
+    local ok, result = parser:pparse(parsed_args)
+    if ok and result.cmd_bob then
+      best_args = result
+      best_index = i + 1
+    end
+  end
+
+  if best_index ~= -1 then
+    local bob_args = {}
+    for i = best_index, #args do
+      bob_args[#bob_args + 1] = args[i]
+    end
+
+    M.setup(best_args)
+
+    if best_args.bob_help then
+      bob_args[#bob_args + 1] = "--help"
+    end
+
+    local bob = require("deploy.bob")
+    bob.run(bob_args)
+
+    return true
+  end
+end
+
+function M.run(args)
+end
+
+return M
