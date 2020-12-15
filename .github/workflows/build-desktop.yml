@@ -33,7 +33,7 @@ jobs:
         p12-password: ${{ secrets.APPLE_CERTIFICATES_P12_PASSWORD }}
     - name: Set environment variables
       run: > 
-        echo "MAC_IDENTITY=${{ secrets.MAC_IDENTITY }}" >> $GITHUB_ENV &&j
+        echo "MAC_IDENTITY=${{ secrets.MAC_IDENTITY }}" >> $GITHUB_ENV &&
         echo "APPLE_ID=${{ secrets.APPLE_ID }}" >> $GITHUB_ENV &&
         echo "APPLE_ID_PASSWORD=${{ secrets.APPLE_ID_PASSWORD }}" >> $GITHUB_ENV &&
         echo "ASC_PROVIDER=${{ secrets.ASC_PROVIDER }}" >> $GITHUB_ENV
