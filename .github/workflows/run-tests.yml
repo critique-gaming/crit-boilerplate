@@ -15,7 +15,7 @@ jobs:
       with:
         java-version: '11'
     - name: Setup Defold
-      uses: dapetcu21/setup-defold@v3
+      uses: dapetcu21/setup-defold@v3.0.1
     - name: Resolve dependencies
       run: 'java -jar $BOB --auth "foobar" --email "john@doe.com" resolve'
     - name: Build project
