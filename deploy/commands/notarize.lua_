@@ -5,7 +5,7 @@ M.id = "cmd_notarize"
 function M.arg_config(cmd)
   local dotenv = require("deploy.dotenv")
   cmd:option("--apple-id", "Apple ID username", dotenv.getenv("APPLE_ID"))
-  cmd:option("--apple-id-password", "Apple ID password", dotenv.getenv("APPLE_ID_PASSWORD"))
+  cmd:option("--apple-id-password", "Apple ID password", dotenv.getenv("APPLE_ID_PASSWORD")):show_default(false)
   cmd:option("--asc-provider", "Your short Apple Developer Account team ID", dotenv.getenv("ASC_PROVIDER"))
 end
 

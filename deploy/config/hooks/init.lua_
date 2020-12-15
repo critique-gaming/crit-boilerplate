@@ -1,1 +1,2 @@
 -- Add your game-specific customizations and commands here
+require("deploy.config.hooks.apkx")

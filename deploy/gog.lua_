@@ -4,6 +4,7 @@ local read_project = require("deploy.project")
 local notarize = require("deploy.notarize")
 local dotenv = require("deploy.dotenv")
 local util = require("deploy.util")
+local api = require("deploy.api")
 
 local function gog_upload(branch, platforms, build_dir, options)
   print("Building for GOG branch \"" .. branch .. "\"...")
@@ -12,8 +13,8 @@ local function gog_upload(branch, platforms, build_dir, options)
   assert(options.gog_user, "--gog-user is required")
   assert(options.gog_password, "--gog-password is required")
 
-  local config = require("deploy.gog.config")
-  local branch_config = config[branch]
+  local config = require("deploy.config.gog")
+  local branch_config = config.branches[branch]
   assert(branch_config, "No such GOG branch defined in config: " .. branch)
 
   local build_options = util.deep_clone(branch.build_options)
@@ -71,6 +72,35 @@ local function gog_upload(branch, platforms, build_dir, options)
   end
 end
 
+local function gog_upload_all(build_dir, options)
+  local config = require("deploy.config.gog")
+  for branch in pairs(config.branches) do
+    gog_upload(branch, nil, path.join(build_dir, branch), options)
+  end
+end
+
+local function with_hooks(f)
+  api.hook_closure(function ()
+    api.register_hook("resolve:per_platform_dependencies", function (additional_deps, removed_deps)
+      local config = require("deploy.config.gog")
+      additional_deps[#additional_deps + 1] = dotenv.getenv("GOG_GALAXY_DEPENDENCY_URL")
+        or config.gog_galaxy_dependency_url
+    end)
+
+    api.register_hook("build:bob_args", function (bob_args, context)
+      util.add_settings_file(bob_args, "gog", context.option.debug)
+    end)
+
+    api.register_hook("build:game_project", function (overrides, context)
+      util.set_init(overrides, "crit", "gog", 1)
+    end)
+
+    f()
+  end)
+end
+
 return {
   gog_upload = gog_upload,
+  gog_upload_all = gog_upload_all,
+  with_hooks = with_hooks,
 }

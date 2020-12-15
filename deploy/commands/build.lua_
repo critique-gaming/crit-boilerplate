@@ -1,16 +1,21 @@
-local M = {}
+local api = require("deploy.api")
 
+local M = {}
 M.id = "cmd_build"
 
 function M.arg_config_mobile(cmd)
   local dotenv = require("deploy.dotenv")
   cmd:option("--version-code", "Override android.version_code and ios.build_number in game.project")
-  cmd:option("--apkx-main-version", "APK Expansion main file version")
-  cmd:option("--apkx-patch-version", "APK Expansion patch file version")
-  cmd:option("--android-certificate", "Path to an Android certificate", dotenv.getenv("ANDROID_CERTIFICATE"))
-  cmd:option("--android-private-key", "Path to an Android private key", dotenv.getenv("ANDROID_PRIVATE_KEY"))
+  cmd:option("--android-keystore", "Path to an Android keystore", dotenv.getenv("ANDROID_KEYSTORE"))
+  cmd:option("--android-keystore-alias", "Alias to the Android signing keypair in the keystore",
+    dotenv.getenv("ANDROID_KEYSTORE_ALIAS")
+  )
+  cmd:option("--android-keystore-password", "The password to the Android keystore",
+    dotenv.getenv("ANDROID_KEYSTORE_PASSWORD")
+  ):show_default(false)
   cmd:option("--ios-identity", "iOS certificate identity", dotenv.getenv("IOS_IDENTITY"))
   cmd:option("--ios-provisioning", "Path to the iOS provisioning profile", dotenv.getenv("IOS_PROVISIONING"))
+  api.run_hook("build:arg_config_mobile", cmd)
 end
 
 function M.arg_config_mac(cmd)
@@ -18,6 +23,7 @@ function M.arg_config_mac(cmd)
   cmd:option("--mac-identity", "macOS certificate identity", dotenv.getenv("MAC_IDENTITY"))
   cmd:flag("--skip-notarize", "Skip notarization")
   require("deploy.commands.notarize").arg_config(cmd)
+  api.run_hook("build:arg_config_mac", cmd)
 end
 
 function M.arg_config(cmd)
@@ -29,11 +35,13 @@ function M.arg_config(cmd)
   cmd:flag("--skip-texture-compression", "Skip texture compression")
   cmd:option("--build-server", "Defold build server URL", dotenv.getenv("DEFOLD_BUILD_SERVER"))
   require("deploy.commands.resolve").arg_config(cmd)
+  api.run_hook("build:arg_config", cmd)
 end
 
 function M.arg_config_version(cmd)
   cmd:option("--version", "Override project.version in game.project")
   cmd:option("--version-suffix", "Append suffix to version string")
+  api.run_hook("build:arg_config_version", cmd)
 end
 
 function M.parser_config(parser)
@@ -46,6 +54,7 @@ function M.parser_config(parser)
   M.arg_config_version(cmd)
   M.arg_config_mobile(cmd)
   M.arg_config_mac(cmd)
+  api.run_hook("build:parser_config", parser, cmd)
 end
 
 function M.check_git_status_if_needed(args)
@@ -64,6 +73,7 @@ end
 function M.setup(args)
   M.check_git_status_if_needed(args)
   require("deploy.commands.bob").setup(args)
+  api.run_hook("build:setup", args)
 end
 
 function M.run(args, post_build)
@@ -78,14 +88,17 @@ function M.run(args, post_build)
 
   local function package(build_output, platform)
     if not args.skip_build then
+      api.run_hook("build:pre_build", platform, build_output)
       local build = require("deploy.build")
       build(platform, build_output, args)
+      api.run_hook("build:post_build", platform, build_output)
     end
 
     local notarize
     local app_path
     local notarization_id
     if platform == "mac" and not args.skip_notarize and args.apple_id and args.apple_id_password then
+      api.run_hook("build:pre_notarize", platform, build_output)
       notarize = require("deploy.notarize")
       local read_project = require("deploy.project")
       local project_title = read_project().title
@@ -98,7 +111,9 @@ function M.run(args, post_build)
       if notarize then
         notarize.wait(notarization_id, args)
         notarize.staple(app_path)
+        api.run_hook("build:post_notarize", platform, build_output)
       end
+
 
       if post_build then
         post_build(platform, build_output)

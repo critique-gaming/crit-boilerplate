@@ -3,6 +3,7 @@ local shell = require("shell")
 local read_project = require("deploy.project")
 local notarize = require("deploy.notarize")
 local util = require("deploy.util")
+local api = require("deploy.api")
 
 local function steam_upload(branch, build_dir, options)
   print("Building for Steam branch \"" .. branch .. "\"...")
@@ -11,8 +12,8 @@ local function steam_upload(branch, build_dir, options)
   assert(options.steam_user, "--steam-user is required")
   assert(options.steam_password, "--steam-password is required")
 
-  local config = require("deploy.steam.config")
-  local branch_config = config[branch]
+  local config = require("deploy.config.steam")
+  local branch_config = config.branches[branch]
   assert(branch_config, "No such Steam branch defined in config: " .. branch)
 
   local build_options = util.deep_clone(branch.build_options)
@@ -86,14 +87,36 @@ local function steam_login(options)
 end
 
 local function steam_upload_all(build_dir, options)
-  local config = require("deploy.steam.config")
-  for branch in pairs(config) do
+  local config = require("deploy.config.steam")
+  for branch in pairs(config.branches) do
     steam_upload(branch, path.join(build_dir, branch), options)
   end
+end
+
+local function with_hooks(f)
+  api.hook_closure(function ()
+    api.register_hook("resolve:per_platform_dependencies", function (additional_deps, removed_deps)
+      local dotenv = require("deploy.dotenv")
+      local config = require("deploy.config.steam")
+      additional_deps[#additional_deps + 1] = dotenv.getenv("STEAMWORKS_DEPENDENCY_URL")
+        or config.steamworks_dependency_url
+    end)
+
+    api.register_hook("build:bob_args", function (bob_args, context)
+      util.add_settings_file(bob_args, "steam", context.option.debug)
+    end)
+
+    api.register_hook("build:game_project", function (overrides, context)
+      util.set_init(overrides, "crit", "steam", 1)
+    end)
+
+    f()
+  end)
 end
 
 return {
   steam_upload_all = steam_upload_all,
   steam_upload = steam_upload,
   steam_login = steam_login,
+  with_hooks = with_hooks,
 }

@@ -7,6 +7,8 @@ local dotenv = require("deploy.dotenv")
 local api = require("deploy.api")
 local inifile = require("inifile")
 
+local set_ini = util.set_ini
+
 local platforms = {
   mac = "x86_64-darwin",
   linux = "x86_64-linux",
@@ -29,11 +31,6 @@ local function rmdir(p)
     })
     path.remove(p)
   end)
-end
-
-local function set_ini(ini, category, key, value)
-  ini[category] = ini[category] or {}
-  ini[category][key] = value
 end
 
 local function edit_game_project(context)
@@ -60,15 +57,6 @@ local function edit_game_project(context)
 
   if options.skip_texture_compression then
     set_ini(overrides, "graphics", "texture_profiles", "/builtins/graphics/default.texture_profiles")
-  end
-
-  if options.apkx_patch_version or options.apkx_main_version then
-    if options.apkx_main_version then
-      set_ini(overrides, "apkx", "main_version", options.apkx_main_version)
-    end
-    if options.apkx_patch_version then
-      set_ini(overrides, "apkx", "patch_version", options.apkx_patch_version)
-    end
   end
 
   set_ini(overrides, "project", "dependencies", bob.modify_dependencies_string(
@@ -236,20 +224,17 @@ local function build(platform, output_dir, options)
   end
 
   if platform == "android" then
-    if options.android_certificate then
-      table.insert(bob_args, "--certificate")
-      table.insert(bob_args, options.android_certificate)
+    if options.android_keystore then
+      table.insert(bob_args, "--keystore")
+      table.insert(bob_args, options.android_keystore)
     end
-    if options.android_private_key then
-      table.insert(bob_args, "--private-key")
-      table.insert(bob_args, options.android_private_key)
+    if options.android_keystore_alias then
+      table.insert(bob_args, "--keystore-alias")
+      table.insert(bob_args, options.android_keystore_alias)
     end
-    if options.apkx_patch_version and not options.apkx_main_version then
-      error("Cannot use --apkx-patch-version without --apkx-main-version")
-    end
-    if options.apkx_main_version then
-      table.insert(bob_args, "--liveupdate")
-      table.insert(bob_args, "yes")
+    if options.android_keystore_alias then
+      table.insert(bob_args, "--keystore-alias")
+      table.insert(bob_args, options.android_keystore_password)
     end
   end
 
@@ -260,22 +245,7 @@ local function build(platform, output_dir, options)
   table.insert(bob_args, "--settings")
   table.insert(bob_args, context.overrides_file)
 
-  if platform == "switch" then
-    table.insert(bob_args, "--settings")
-    table.insert(bob_args, "switch.ini")
-  end
-
-  if options.steam then
-    table.insert(bob_args, "--settings")
-    table.insert(bob_args, "steam.ini")
-  end
-
-  if options.gog then
-    table.insert(bob_args, "--settings")
-    table.insert(bob_args, "gog.ini")
-  end
-
-  api.run_hook("build:args", bob_args, context)
+  api.run_hook("build:bob_args", bob_args, context)
 
   local ok, error_msg = pcall(function ()
     bob.run(bob_args)

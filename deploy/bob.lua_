@@ -53,20 +53,7 @@ api.run_hook("resolve:per_platform_removed_dependencies", per_platform_removed_d
 function M.get_platform_dependencies(opts, platform)
   -- Add any dependency you want to add depending on platform or options
   local additional_deps = {}
-  if opts and opts.steam then
-    additional_deps[#additional_deps + 1] =
-      dotenv.getenv("STEAMWORKS_DEPENDENCY_URL") or "https://github.com/britzl/steamworks-defold/archive/2.0.0.zip"
-  end
-
-  if opts and opts.steam then
-    additional_deps[#additional_deps + 1] = dotenv.getenv("GOG_GALAXY_DEPENDENCY_URL")
-  end
-
-  if platform == "switch" then
-    additional_deps[#additional_deps + 1] = dotenv.getenv("SWITCH_DEPENDENCY_URL")
-  end
-
-  local removed_deps = per_platform_removed_dependencies[platform]
+  local removed_deps = per_platform_removed_dependencies[platform] or {}
 
   return api.reduce_hook("resolve:per_platform_dependencies", additional_deps, removed_deps)
 end

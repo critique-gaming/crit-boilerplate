@@ -1,11 +1,11 @@
 {
     "project": {
-        "baseProductId": "1500286266",
-        "clientId": "52605790530780419",
-        "clientSecret": "8f9cdbc58adaf24e36bd154b422fc34aea907028de3f6e1c48f149ca37e5cb88",
+        "baseProductId": "${product_id}",
+        "clientId": "${client_id}",
+        "clientSecret": "${client_secret}",
         "version": "${full_version}",
         "installDirectory": "${title}",
-        "name": "Interrogation: You Will Be Deceived",
+        "name": "${title}",
         "platform": "gnu-linux",
         "tags": [
             "editor_v_1_4_0"
@@ -14,7 +14,7 @@
         "products": [
             {
                 "name": "${title}",
-                "productId": "1500286266",
+                "productId": "${product_id}",
                 "depots": [
                     {
                         "name": "main",

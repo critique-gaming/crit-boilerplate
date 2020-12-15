@@ -14,34 +14,29 @@ function M.parser_config(parser)
   cmd_build.arg_config(cmd)
   cmd:option("--gog-pipeline-builder", "Path to GOG Galaxy Pipeline Builder", dotenv.getenv("GOG_PIPELINE_BUILDER"))
   cmd:option("--gog-user", "GOG.com account ID", dotenv.getenv("GOG_USER"))
-  cmd:option("--gog-password", "GOG.com account password")
+  cmd:option("--gog-password", "GOG.com account password", dotenv.getenv("GOG_PASSWORD")):show_default(false)
   cmd_build.arg_config_mac(cmd)
 end
 
 function M.run(args)
   cmd_build.setup(args)
 
-  if not args.skip_resolve and not args.skip_build then
-    local bob = require("deploy.bob")
-    bob.resolve()
-  end
-
-  local dotenv = require("deploy.dotenv")
-  args.gog_password = args.gog_password or dotenv.getenv("GOG_PASSWORD")
-
   local gog = require("deploy.gog")
+  gog.with_hooks(function ()
+    if not args.skip_resolve and not args.skip_build then
+      local bob = require("deploy.bob")
+      bob.resolve()
+    end
 
-  local path = require("path")
-  local gog_upload = gog.gog_upload
-  if args.branch then
-    local build_dir = args.build_output or path.join("dist", "gog", args.branch)
-    gog_upload(args.branch, args.platform and { args.platform }, build_dir, args)
-  else
-    path.each(path.join("deploy", "gog", "*"), function (branch)
-      local build_dir = path.join(args.build_output or path.join("dist", "gog"), branch)
-      gog_upload(branch, nil, build_dir, args)
-    end, { param = "n", skipfiles = true })
-  end
+    local path = require("path")
+    if args.branch then
+      local build_dir = args.build_output or path.join("dist", "gog", args.branch)
+      gog.gog_upload(args.branch, args.platform and { args.platform }, build_dir, args)
+    else
+      local build_dir = path.join(args.build_output or path.join("dist", "gog"))
+      gog.gog_upload_all(build_dir, args)
+    end
+  end)
 end
 
 return M

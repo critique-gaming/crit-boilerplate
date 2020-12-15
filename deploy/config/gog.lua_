@@ -1,0 +1,33 @@
+-- Remove this next error() line after you configured your IDs and branches
+error("Before being able to deploy to GOG, you need to configure your Product ID, Client ID and Client Secret in deploy/config/gog.lua_")
+local product_id = "YOUR_PRODUCT_ID_HERE"
+local client_id = "YOUR_CLIENT_ID_HERE"
+local client_secret = "YOUR_CLIENT_SECRET_HERE"
+
+return {
+  gog_galaxy_dependency_url = "https://URL_TO_YOUR_GOG_GALAXY_EXTENSION.zip",
+  branches = {
+    staging = {
+      build_options = {
+        gog = true
+      },
+      template = {
+        product_id = product_id,
+        client_id = client_id,
+        client_secret = client_secret,
+      },
+    },
+    ["staging-debug"] = {
+      build_options = {
+        gog = true,
+        debug = true,
+        version_suffix = ".debug",
+      },
+      template = {
+        product_id = product_id,
+        client_id = client_id,
+        client_secret = client_secret,
+      },
+    },
+  },
+}

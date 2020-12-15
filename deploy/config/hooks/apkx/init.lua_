@@ -1,0 +1,51 @@
+local api = require("deploy.api")
+local util = require("deploy.util")
+
+api.register_hook("build:arg_config_mobile", function (cmd)
+  cmd:option("--apkx-main-version", "APK Expansion main file version")
+  cmd:option("--apkx-patch-version", "APK Expansion patch file version")
+end)
+
+api.register_hook("build:bob_args", function (bob_args, context)
+  if context.platform == "android" then
+    local options = context.options
+    if options.apkx_patch_version and not options.apkx_main_version then
+      error("Cannot use --apkx-patch-version without --apkx-main-version")
+    end
+    if options.apkx_main_version then
+      table.insert(bob_args, "--liveupdate")
+      table.insert(bob_args, "yes")
+    end
+  end
+end)
+
+api.register_hook("build:game_project", function (overrides, context)
+  if context.platform == "android" then
+    local options = context.options
+    if options.apkx_main_version then
+      util.set_ini(overrides, "apkx", "main_version", options.apkx_main_version)
+    end
+    if options.apkx_patch_version then
+      util.set_ini(overrides, "apkx", "patch_version", options.apkx_patch_version)
+    end
+  end
+end)
+
+api.register_command({
+  id = "zip_diff",
+
+  parser_config = function (parser)
+    local cmd = parser:command("zip_diff",
+      "Given two zip files, generate a zip that contains only the new files added " ..
+      "in the first zip, when compared to the second one"
+    )
+    cmd:argument("out_file", "Path to the resulting zip diff")
+    cmd:argument("new_file", "Path to the first (new) zip")
+    cmd:argument("old_file", "Path to the second (old) zip")
+  end,
+
+  run = function (args)
+    local zip_diff = require("deploy.config.hooks.apkx.zip_diff")
+    zip_diff(args.out_file, args.new_file, args.old_file)
+  end,
+})

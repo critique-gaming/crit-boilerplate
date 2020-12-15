@@ -15,7 +15,7 @@ local argparse = require("argparse")
 local api = require("deploy.api")
 
 require("deploy.commands")
-require("deploy.hooks")
+require("deploy.config.hooks")
 
 local parser = argparse("deploy.lua", "Deploy script")
 parser:flag("-v --verbose", "Output verbose info")

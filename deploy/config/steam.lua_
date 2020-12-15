@@ -1,0 +1,36 @@
+-- Remove this next error() line after you configured your IDs and branches
+error("Before being able to deploy to Steam, you need to configure your app and depot IDs in deploy/config/steam.lua_")
+local app_id = "YOUR_APP_ID_HERE"
+local depot_id_windows = "WINDOWS_DEPOT_ID_HERE"
+local depot_id_macos = "MACOS_DEPOT_ID_HERE"
+local depot_id_linux = "LINUX_DEPOT_ID_HERE"
+
+return {
+  steamworks_dependency_url = "https://github.com/britzl/steamworks-defold/archive/2.0.2.zip",
+  branches = {
+    staging = {
+      build_options = {
+        steam = true
+      },
+      template = {
+        app_id = app_id,
+        depot_id_windows = depot_id_windows,
+        depot_id_macos = depot_id_macos,
+        depot_id_linux = depot_id_linux,
+      },
+    },
+    ["staging-debug"] = {
+      build_options = {
+        steam = true,
+        debug = true,
+        version_suffix = ".debug",
+      },
+      template = {
+        app_id = app_id,
+        depot_id_windows = depot_id_windows,
+        depot_id_macos = depot_id_macos,
+        depot_id_linux = depot_id_linux,
+      },
+    },
+  }
+}

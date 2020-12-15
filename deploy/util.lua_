@@ -39,9 +39,33 @@ local function deep_clone(t)
   return new_t
 end
 
+local function set_ini(ini, category, key, value)
+  ini[category] = ini[category] or {}
+  ini[category][key] = value
+end
+
+local function add_settings_file(bob_args, filename, debug)
+  local path = require("path")
+  local fpath = path.join("deploy", "config", "project_properties", filename)
+
+  local general_file = fpath .. ".ini"
+  if path.isfile(general_file) then
+    table.insert(bob_args, "--settings")
+    table.insert(bob_args, general_file)
+  end
+
+  local variant_file = fpath .. (debug and "_debug" or "_release") .. ".ini"
+  if path.isfile(variant_file) then
+    table.insert(bob_args, "--settings")
+    table.insert(bob_args, variant_file)
+  end
+end
+
 return {
   read_file = read_file,
   write_file = write_file,
   template = template,
   deep_clone = deep_clone,
+  set_ini = set_ini,
+  add_settings_file = add_settings_file,
 }
