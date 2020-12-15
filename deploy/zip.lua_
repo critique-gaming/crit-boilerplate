@@ -7,14 +7,14 @@ local M = {}
 local function ensure_binaries()
   if not M.zip_bin then
     if dotenv.os_name == "Windows" then
-      M.zip_bin = path.fullpath(path.join("deploy", "zip.exe"))
+      M.zip_bin = path.fullpath(path.join("deploy", "bin", "windows-x86_64", "zip.exe"))
     else
       M.zip_bin = "zip"
     end
   end
   if not M.unzip_bin then
     if dotenv.os_name == "Windows" then
-      M.unzip_bin = path.fullpath(path.join("deploy", "unzip.exe"))
+      M.unzip_bin = path.fullpath(path.join("deploy", "bin", "windows-x86_64", "unzip.exe"))
     else
       M.unzip_bin = "unzip"
     end
