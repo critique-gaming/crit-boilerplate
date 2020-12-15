@@ -72,30 +72,29 @@ function M.get_platform_dependencies(opts, platform)
 end
 
 function M.modify_dependencies_string(deps_string, additional_deps, removed_deps)
-  deps_string = deps_string or ""
-
-  if removed_deps and next(removed_deps) then
-    local deps = {}
-    for dep in deps_string:gmatch('[^,]+') do
-      local removed = false
+  local deps = {}
+  for dep in deps_string:gmatch('[^,]+') do
+    local removed = false
+    if removed_deps then
       for _, item in ipairs(removed_deps) do
         if dep:match(item) then
           removed = true
           break
         end
       end
-      if not removed then
-        deps[#deps + 1] = dep
-      end
     end
-    deps_string = deps_string .. table.concat(deps, ",")
+    if not removed then
+      deps[#deps + 1] = dep
+    end
   end
 
-  if additional_deps and next(additional_deps) then
-    deps_string = table.concat({ deps_string, (unpack or table.unpack)(additional_deps) }, ",")
+  if additional_deps then
+    for i = 1, #additional_deps do
+      deps[#deps + 1] = additional_deps[i]
+    end
   end
 
-  return deps_string
+  return table.concat(deps, ",")
 end
 
 function M.inject_dependencies_string(project_str, additional_deps, removed_deps)
