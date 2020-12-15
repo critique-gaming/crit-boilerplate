@@ -11,11 +11,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
     - name: Install Lua
-      uses: leafo/gh-actions-lua@v6
+      uses: leafo/gh-actions-lua@v8.0.0
       with:
         luaVersion: "luajit-2.1.0-beta3"
     - name: Install LuaRocks
-      uses: leafo/gh-actions-luarocks@v2
+      uses: leafo/gh-actions-luarocks@v4.0.0
     - name: Install lua-discount
       run: >
         curl http://www.pell.portland.or.us/\~orc/Code/discount/discount-2.2.6.tar.bz2 > discount.tar.bz2 &&

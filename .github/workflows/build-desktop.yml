@@ -17,13 +17,13 @@ jobs:
       with:
         java-version: '11'
     - name: Setup Defold
-      uses: dapetcu21/setup-defold@v2
+      uses: dapetcu21/setup-defold@v3
     - name: Setup LuaJIT
-      uses: dapetcu21/gh-actions-lua@master
+      uses: dapetcu21/gh-actions-lua@v8.0.0
       with:
         luaVersion: 'luajit'
     - name: Setup LuaRocks
-      uses: leafo/gh-actions-luarocks@v2
+      uses: leafo/gh-actions-luarocks@v4.0.0
     - name: Install LuaFileSystem
       run: 'luarocks install luafilesystem'
     - name: Import Code-signing certs
@@ -33,10 +33,10 @@ jobs:
         p12-password: ${{ secrets.APPLE_CERTIFICATES_P12_PASSWORD }}
     - name: Set environment variables
       run: > 
-        echo ::set-env name=MAC_IDENTITY::${{ secrets.MAC_IDENTITY }} &&
-        echo ::set-env name=APPLE_ID::${{ secrets.APPLE_ID }} &&
-        echo ::set-env name=APPLE_ID_PASSWORD::${{ secrets.APPLE_ID_PASSWORD }} &&
-        echo ::set-env name=ASC_PROVIDER::${{ secrets.ASC_PROVIDER }}
+        echo "MAC_IDENTITY=${{ secrets.MAC_IDENTITY }}" >> $GITHUB_ENV &&j
+        echo "APPLE_ID=${{ secrets.APPLE_ID }}" >> $GITHUB_ENV &&
+        echo "APPLE_ID_PASSWORD=${{ secrets.APPLE_ID_PASSWORD }}" >> $GITHUB_ENV &&
+        echo "ASC_PROVIDER=${{ secrets.ASC_PROVIDER }}" >> $GITHUB_ENV
     - name: Make debug builds
       run: 'cd repo && lua deploy.lua_ package --debug --version-suffix .debug --skip-notarize'
     - name: Archive debug builds
