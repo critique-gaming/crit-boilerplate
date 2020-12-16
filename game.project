@@ -20,3 +20,8 @@ dependencies = https://github.com/britzl/deftest/archive/2.7.1.zip,https://githu
 use_accelerometer = 0
 game_binding = /crit/all.input_bindingc
 
+[native_extension]
+app_manifest = /deploy/config/manifests/engine.appmanifest
+
+[shader]
+output_spirv = 1

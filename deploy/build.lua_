@@ -43,8 +43,10 @@ local function edit_game_project(context)
 
   set_ini(overrides, "crit", "bundled", 1)
 
-  if not options.debug and ini.native_extension and ini.native_extension.app_manifest == "debug.appmanifest" then
-    set_ini(overrides, "native_extension", "app_manifest", "release.app_manifest")
+  if not options.debug and ini.native_extension and
+    ini.native_extension.app_manifest == "/deploy/config/manifests/engine_debug.appmanifest"
+  then
+    set_ini(overrides, "native_extension", "app_manifest", "/deploy/config/manifests/engine.app_manifest")
   end
 
   set_ini(overrides, "project", "version", context.versions.version)
