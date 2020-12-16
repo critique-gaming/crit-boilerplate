@@ -7,7 +7,7 @@ local filenames = {
   mac = "_macos.zip",
   linux = "_linux.zip",
   web = "_web.zip",
-  android = "_android.apk",
+  android = "_android.aab",
   ios = "_ios.ipa",
 }
 
@@ -36,19 +36,38 @@ local function package_build(platform, input_dir, output_dir)
 
   if platform == "ios" then
     path.copy(path.join(input_dir, project_title .. ".ipa"), package_filename)
-    zip.create(path.join(input_dir, project_title .. ".dSYM"), path.join(private_dir, project_title .. "_ios_symbols.zip"), 1)
+    zip.create(
+      path.join(input_dir, project_title .. ".dSYM"),
+      path.join(private_dir, project_title .. "_ios_symbols.zip"),
+      1
+    )
+
   elseif platform == "android" then
-    path.copy(path.join(input_dir, project_title, project_title .. ".apk"), package_filename)
+    path.copy(path.join(input_dir, project_title, project_title .. ".aab"), package_filename)
+    zip.create(
+      path.join(input_dir, project_title, project_title .. ".apk.symbols"),
+      path.join(private_dir, project_title .. "_android_symbols.zip"),
+      1
+    )
+
   elseif platform == "web" then
     zip.create(path.join(input_dir, project_title), package_filename)
+
   elseif platform == "mac" then
     zip.create(path.join(input_dir, project_title .. ".app"), package_filename, 1)
-    zip.create(path.join(input_dir, project_title .. ".dSYM"), path.join(private_dir, project_title .. "_macos_symbols.zip"), 1)
+    zip.create(
+      path.join(input_dir, project_title .. ".dSYM"),
+      path.join(private_dir, project_title .. "_macos_symbols.zip"),
+      1
+    )
+
   elseif platform == "windows" then
     zip.create(path.join(input_dir, project_title), package_filename, 1)
     path.copy(path.join(input_dir, "dmengine.pdb"), path.join(private_dir, "dmengine.pdb"))
+
   else
     zip.create(input_dir, package_filename, nil, { '-x', 'VERSION.txt' })
+
   end
 end
 

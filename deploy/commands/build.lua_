@@ -13,6 +13,9 @@ function M.arg_config_mobile(cmd)
   cmd:option("--android-keystore-password", "The password to the Android keystore",
     dotenv.getenv("ANDROID_KEYSTORE_PASSWORD")
   ):show_default(false)
+  cmd:option("--android-keystore-password-file", "The file containing the password to the Android keystore",
+    dotenv.getenv("ANDROID_KEYSTORE_PASSWORD_FILE")
+  )
   cmd:option("--ios-identity", "iOS certificate identity", dotenv.getenv("IOS_IDENTITY"))
   cmd:option("--ios-provisioning", "Path to the iOS provisioning profile", dotenv.getenv("IOS_PROVISIONING"))
   api.run_hook("build:arg_config_mobile", cmd)

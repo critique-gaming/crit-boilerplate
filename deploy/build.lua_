@@ -171,6 +171,7 @@ local function build(platform, output_dir, options)
   local restore_game_project = edit_game_project(context)
   local restore_env_lua = write_env_lua()
   local to_cleanup = api.run_hook("build:prepare", context)
+  local passfile
 
   local function restore()
     if options.no_cleanup then
@@ -179,6 +180,10 @@ local function build(platform, output_dir, options)
         "Please run something like `git add . && git reset --hard` before running this script again."
       )
       return
+    end
+
+    if passfile then
+      os.remove(passfile)
     end
 
     for i = to_cleanup.n, 1, -1 do
@@ -235,9 +240,14 @@ local function build(platform, output_dir, options)
       table.insert(bob_args, "--keystore-alias")
       table.insert(bob_args, options.android_keystore_alias)
     end
-    if options.android_keystore_alias then
+    if options.android_keystore_password then
+      passfile = path.join(output_dir, "android_keystore_password.txt")
+      util.write_file(passfile, options.android_keystore_password)
       table.insert(bob_args, "--keystore-pass")
-      table.insert(bob_args, options.android_keystore_password)
+      table.insert(bob_args, passfile)
+    elseif options.android_keystore_password_file then
+      table.insert(bob_args, "--keystore-pass")
+      table.insert(bob_args, "pass:" .. options.android_keystore_password_file)
     end
   end
 
@@ -248,9 +258,9 @@ local function build(platform, output_dir, options)
   table.insert(bob_args, "--settings")
   table.insert(bob_args, context.overrides_file)
 
-  api.run_hook("build:bob_args", bob_args, context)
 
   local ok, error_msg = pcall(function ()
+    api.run_hook("build:bob_args", bob_args, context)
     bob.run(bob_args)
   end)
 
