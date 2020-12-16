@@ -231,6 +231,9 @@ local function build(platform, output_dir, options)
         "Your iOS build will be unsigned!"
       )
     end
+
+    table.insert(bob_args, "--architectures")
+    table.insert(bob_args, "arm64-darwin")
   end
 
   if platform == "android" then
