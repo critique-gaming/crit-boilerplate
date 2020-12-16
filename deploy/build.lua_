@@ -224,7 +224,10 @@ local function build(platform, output_dir, options)
       table.insert(bob_args, "--mobileprovisioning")
       table.insert(bob_args, options.ios_provisioning)
     else
-      print("WARNING! You did not provide a code signing identity or provisioning profile. Your iOS buid will be unsigned!")
+      print(
+        "WARNING! You did not provide a code signing identity or provisioning profile. " ..
+        "Your iOS buid will be unsigned!"
+      )
     end
   end
 
