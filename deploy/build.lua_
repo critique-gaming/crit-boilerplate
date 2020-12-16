@@ -224,6 +224,9 @@ local function build(platform, output_dir, options)
   end
 
   if platform == "android" then
+    table.insert(bob_args, "--bundle-format")
+    table.insert(bob_args, "aab")
+
     if options.android_keystore then
       table.insert(bob_args, "--keystore")
       table.insert(bob_args, options.android_keystore)
