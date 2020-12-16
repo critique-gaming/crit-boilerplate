@@ -103,7 +103,7 @@ local function run_codesign(item, identity)
     "--options", "runtime",
     "--timestamp",
     "--no-strict",
-    "--entitlements", path.join("deploy", "config", "macos_entitlements.plist"),
+    "--entitlements", path.join("deploy", "config", "manifests", "mac", "entitlements.plist"),
     item
   })
 end
