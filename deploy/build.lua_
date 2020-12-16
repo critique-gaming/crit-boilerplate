@@ -236,7 +236,7 @@ local function build(platform, output_dir, options)
       table.insert(bob_args, options.android_keystore_alias)
     end
     if options.android_keystore_alias then
-      table.insert(bob_args, "--keystore-alias")
+      table.insert(bob_args, "--keystore-pass")
       table.insert(bob_args, options.android_keystore_password)
     end
   end
