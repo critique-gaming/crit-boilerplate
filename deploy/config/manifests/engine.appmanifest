@@ -1,21 +1,21 @@
-# App manifest generated Wed Dec 16 2020 21:40:54 GMT+0200 (EET)
-# Settings: Physics3D,Record,Vulkan,OpenGL
+# App manifest generated Wed Dec 16 2020 22:17:02 GMT+0200 (EET)
+# Settings: Physics3D,Record,OpenGL
 platforms:
     x86_64-osx:
         context:
             excludeLibs: ["physics","LinearMath","BulletDynamics","BulletCollision","record","vpx"]
             excludeSymbols: []
-            symbols: ["GraphicsAdapterVulkan"]
-            libs: ["physics_2d","record_null","graphics_vulkan","MoltenVK"]
-            frameworks: ["Metal","IOSurface","QuartzCore"]
+            symbols: []
+            libs: ["physics_2d","record_null"]
+            frameworks: []
             linkFlags: []
 
     x86_64-linux:
         context:
             excludeLibs: ["physics","LinearMath","BulletDynamics","BulletCollision","record","vpx"]
             excludeSymbols: []
-            symbols: ["GraphicsAdapterVulkan"]
-            libs: ["physics_2d","record_null","graphics_vulkan","X11-xcb"]
+            symbols: []
+            libs: ["physics_2d","record_null"]
             linkFlags: []
 
     js-web:
@@ -40,16 +40,16 @@ platforms:
         context:
             excludeLibs: ["libphysics","libLinearMath","libBulletDynamics","libBulletCollision","librecord","vpx"]
             excludeSymbols: []
-            symbols: ["GraphicsAdapterVulkan"]
-            libs: ["libphysics_2d.lib","librecord_null.lib","libgraphics_vulkan.lib","vulkan-1.lib"]
+            symbols: []
+            libs: ["libphysics_2d.lib","librecord_null.lib"]
             linkFlags: []
 
     x86_64-win32:
         context:
             excludeLibs: ["libphysics","libLinearMath","libBulletDynamics","libBulletCollision","librecord","vpx"]
             excludeSymbols: []
-            symbols: ["GraphicsAdapterVulkan"]
-            libs: ["libphysics_2d.lib","librecord_null.lib","libgraphics_vulkan.lib","vulkan-1.lib"]
+            symbols: []
+            libs: ["libphysics_2d.lib","librecord_null.lib"]
             linkFlags: []
 
     armv7-android:
@@ -57,8 +57,8 @@ platforms:
             excludeLibs: ["physics","LinearMath","BulletDynamics","BulletCollision","record","vpx"]
             excludeJars: []
             excludeSymbols: []
-            symbols: ["GraphicsAdapterVulkan"]
-            libs: ["physics_2d","record_null","graphics_vulkan"]
+            symbols: []
+            libs: ["physics_2d","record_null"]
             linkFlags: []
 
     arm64-android:
@@ -66,8 +66,8 @@ platforms:
             excludeLibs: ["physics","LinearMath","BulletDynamics","BulletCollision","record","vpx"]
             excludeJars: []
             excludeSymbols: []
-            symbols: ["GraphicsAdapterVulkan"]
-            libs: ["physics_2d","record_null","graphics_vulkan"]
+            symbols: []
+            libs: ["physics_2d","record_null"]
             linkFlags: []
 
     armv7-ios:
@@ -83,9 +83,9 @@ platforms:
         context:
             excludeLibs: ["physics","LinearMath","BulletDynamics","BulletCollision","record","vpx"]
             excludeSymbols: []
-            symbols: ["GraphicsAdapterVulkan"]
-            libs: ["physics_2d","record_null","graphics_vulkan","MoltenVK"]
-            frameworks: ["Metal","QuartzCore"]
+            symbols: []
+            libs: ["physics_2d","record_null"]
+            frameworks: []
             linkFlags: []
 
     x86_64-ios:
@@ -96,4 +96,5 @@ platforms:
             libs: ["physics_2d","record_null"]
             frameworks: []
             linkFlags: []
+
 

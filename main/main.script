@@ -48,6 +48,9 @@ function init(self)
 
       defos.set_view_size(x, y, width, height)
     end
+
+    -- Workaround for Vulkan bug
+    defos.activate()
   end
 end
 
