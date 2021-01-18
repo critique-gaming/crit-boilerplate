@@ -1,6 +1,7 @@
 local path = require("path")
 local read_project = require("deploy.project")
 local zip = require("deploy.zip")
+local util = require("deploy.util")
 
 local filenames = {
   windows = "_win.zip",
@@ -11,7 +12,7 @@ local filenames = {
   ios = "_ios.ipa",
 }
 
-local function package_build(platform, input_dir, output_dir)
+local function package_build(platform, input_dir, output_dir, options)
   print("Packaging for " .. platform .. "...")
 
   local filename = filenames[platform]
@@ -43,12 +44,52 @@ local function package_build(platform, input_dir, output_dir)
     )
 
   elseif platform == "android" then
-    path.copy(path.join(input_dir, project_title, project_title .. ".aab"), package_filename)
+    local aab_path = path.join(input_dir, project_title, project_title .. ".aab")
+    path.copy(aab_path, package_filename)
     zip.create(
       path.join(input_dir, project_title, project_title .. ".apk.symbols"),
       path.join(private_dir, project_title .. "_android_symbols.zip"),
       1
     )
+
+    local bundletool = require("deploy.bundletool")
+    local cmd = bundletool.build_args()
+    if cmd then
+      local package_basename = path.splitext(package_filename)
+      local apks_filename = path.fullpath(package_basename .. ".apks")
+      local apk_filename = package_basename .. ".apk"
+
+      os.remove(apks_filename)
+      os.remove(apk_filename)
+
+      cmd[#cmd+1] = "build-apks"
+      cmd[#cmd+1] = "--bundle=" .. aab_path
+      cmd[#cmd+1] = "--output=" .. apks_filename
+      cmd[#cmd+1] = "--mode=universal"
+      if options.android_keystore then
+        cmd[#cmd+1] = "--ks=" .. options.android_keystore
+      end
+      if options.android_keystore_alias then
+        cmd[#cmd+1] = "--ks-key-alias=" .. options.android_keystore_alias
+      end
+      if options.android_keystore_password then
+        cmd[#cmd+1] = "--ks-pass=pass:" .. options.android_keystore_password
+      elseif options.android_keystore_password_file then
+        cmd[#cmd+1] = "--ks-pass=file:" .. options.android_keystore_password_file
+      end
+
+      local shell = require("shell")
+      shell.pexecute(cmd)
+
+      local pwd = path.currentdir()
+      path.mkdir(package_basename)
+      path.chdir(package_basename)
+      zip.unzip(apks_filename)
+      path.chdir(pwd)
+      path.rename(path.join(package_basename, "universal.apk"), apk_filename)
+      util.rmdir(package_basename)
+      os.remove(apks_filename)
+    end
 
   elseif platform == "web" then
     zip.create(path.join(input_dir, project_title), package_filename)

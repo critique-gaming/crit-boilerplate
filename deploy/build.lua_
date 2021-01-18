@@ -19,19 +19,7 @@ local platforms = {
   switch = "arm64-nx64",
 }
 
-local function rmdir(p)
-  pcall(function ()
-    path.each(path.join(p,"*"), function(P)
-      path.remove(P)
-    end,{
-      param = "f";   -- request full path
-      delay = true;   -- use snapshot of directory
-      recurse = true; -- include subdirs
-      reverse = true; -- subdirs at first
-    })
-    path.remove(p)
-  end)
-end
+local rmdir = util.rmdir
 
 local function edit_game_project(context)
   local options = context.options
@@ -54,7 +42,7 @@ local function edit_game_project(context)
 
   if options.version_code then
     set_ini(overrides, "android", "version_code", options.version_code)
-    set_ini(overrides, "ios", "build_number", options.version_code)
+    set_ini(overrides, "ios", "bundle_version", options.version_code)
   end
 
   if options.skip_texture_compression then
@@ -255,7 +243,7 @@ local function build(platform, output_dir, options)
       table.insert(bob_args, passfile)
     elseif options.android_keystore_password_file then
       table.insert(bob_args, "--keystore-pass")
-      table.insert(bob_args, "pass:" .. options.android_keystore_password_file)
+      table.insert(bob_args, options.android_keystore_password_file)
     end
   end
 

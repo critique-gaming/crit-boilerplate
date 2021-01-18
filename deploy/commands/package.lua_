@@ -23,7 +23,7 @@ function M.run(args)
     local path = require("path")
     local package_build = require("deploy.package")
     local package_output = args.output or path.join("dist", "package")
-    package_build(platform, build_output, package_output)
+    package_build(platform, build_output, package_output, args)
   end)
 end
 

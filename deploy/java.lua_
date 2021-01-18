@@ -1,0 +1,25 @@
+local M = {}
+local dotenv = require("deploy.dotenv")
+local path = require("path")
+
+local java_home = dotenv.getenv("JAVA_HOME")
+local java_home_override = dotenv.env["JAVA_HOME"]
+local java = dotenv.getenv("JAVA_BIN") or (
+  java_home and java_home ~= "" and path.join(java_home, "bin", "java")
+) or "java"
+
+function M.make_java_args()
+  local java_args = {}
+  if java_home_override and java_home_override ~= "" then
+    if dotenv.os_name == "Windows" then
+      java_args.prefix = "set \"JAVA_HOME=" .. java_home .. "\" && "
+    else
+      table.insert(java_args, "env")
+      table.insert(java_args, "JAVA_HOME=" .. java_home)
+    end
+  end
+  table.insert(java_args, java)
+  return java_args
+end
+
+return M

@@ -1,0 +1,32 @@
+local M = {}
+
+function M.build_args()
+  local dotenv = require("deploy.dotenv")
+
+  local jarfile = dotenv.getenv("BUNDLETOOL_JAR")
+  if jarfile then
+    local java = require("deploy.java")
+    local cmd_args = java.make_java_args()
+    cmd_args[#cmd_args+1] = "-jar"
+    cmd_args[#cmd_args+1] = jarfile
+    return cmd_args
+  end
+
+  local binary = dotenv.getenv("BUNDLETOOL")
+  if binary then
+    return { binary }
+  end
+
+  pcall(function ()
+    local shell = require("shell")
+    shell.pexecute({ "bundletool", "version" })
+    binary = "bundletool"
+  end)
+
+  if binary then
+    return { binary }
+  end
+  return nil
+end
+
+return M

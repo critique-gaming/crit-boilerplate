@@ -61,6 +61,21 @@ local function add_settings_file(bob_args, filename, debug)
   end
 end
 
+local function rmdir(p)
+  local path = require("path")
+  pcall(function ()
+    path.each(path.join(p,"*"), function(P)
+      path.remove(P)
+    end,{
+      param = "f";   -- request full path
+      delay = true;   -- use snapshot of directory
+      recurse = true; -- include subdirs
+      reverse = true; -- subdirs at first
+    })
+    path.remove(p)
+  end)
+end
+
 return {
   read_file = read_file,
   write_file = write_file,
@@ -68,4 +83,5 @@ return {
   deep_clone = deep_clone,
   set_ini = set_ini,
   add_settings_file = add_settings_file,
+  rmdir = rmdir,
 }

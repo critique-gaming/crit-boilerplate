@@ -5,7 +5,7 @@ M.id = "cmd_build"
 
 function M.arg_config_mobile(cmd)
   local dotenv = require("deploy.dotenv")
-  cmd:option("--version-code", "Override android.version_code and ios.build_number in game.project")
+  cmd:option("--version-code", "Override android.version_code and ios.bundle_version in game.project")
   cmd:option("--android-keystore", "Path to an Android keystore", dotenv.getenv("ANDROID_KEYSTORE"))
   cmd:option("--android-keystore-alias", "Alias to the Android signing keypair in the keystore",
     dotenv.getenv("ANDROID_KEYSTORE_ALIAS")
