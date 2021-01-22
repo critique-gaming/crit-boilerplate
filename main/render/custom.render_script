@@ -5,18 +5,30 @@ local ScrollBar = require "crit.scrollbar"
 local Scroll = require "crit.scroll"
 local dispatcher = require "crit.dispatcher"
 local transitions = require "monarch.transitions.gui"
+local env = require "crit.env"
+
+local max_ar = env.max_ar or (16 / 9)
+local min_ar = env.min_ar or (16 / 10)
 
 Layout.default_scale_by = "x"
 
 local function configure_layout(self)
-  local design_width = render.get_width()
-  local design_height = render.get_height()
   local window_width = render.get_window_width()
   local window_height = render.get_window_height()
 
-  local zoom = math.min(window_width / design_width, window_height / design_height)
-  local viewport_width = design_width * zoom
-  local viewport_height = design_height * zoom
+  local viewport_width = window_width
+  local viewport_height = window_height
+  if not env.no_letterboxing then
+    local aspect = viewport_width / viewport_height
+    if aspect > max_ar then
+      viewport_width = math.ceil(viewport_height * max_ar)
+    elseif aspect < min_ar then
+      viewport_height = math.ceil(viewport_width / min_ar)
+    end
+  end
+
+  local projection_width = Layout.design_width
+  local projection_height = viewport_height * projection_width / viewport_width
 
   Layout.set_metrics({
     window_width = window_width,
@@ -25,8 +37,8 @@ local function configure_layout(self)
     viewport_height = viewport_height,
     projection_left = 0,
     projection_bottom = 0,
-    projection_right = design_width,
-    projection_top = design_height,
+    projection_right = projection_width,
+    projection_top = projection_height,
   })
 
   transitions.window_resized(Layout.viewport_width, Layout.viewport_height);
