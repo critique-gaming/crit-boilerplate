@@ -14,7 +14,7 @@ high_dpi = 1
 title = crit-boilerplate
 version = 1.0.0
 custom_resources = _env/,intl/
-dependencies = https://github.com/britzl/deftest/archive/2.7.1.zip,https://github.com/subsoap/defos/archive/v2.4.2.zip,https://github.com/britzl/monarch/archive/3.2.0.zip,https://github.com/defold/extension-vulkan/archive/master.zip
+dependencies = https://github.com/britzl/deftest/archive/2.7.1.zip,https://github.com/subsoap/defos/archive/v2.4.2.zip,https://github.com/britzl/monarch/archive/3.2.0.zip,https://github.com/defold/extension-vulkan/archive/1.1.0.zip,https://github.com/dapetcu21/extension-safearea/archive/master.zip
 
 [input]
 use_accelerometer = 0

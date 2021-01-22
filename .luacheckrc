@@ -23,6 +23,7 @@ globals = {
         "profiler",
         "render",
         "resource",
+        "safearea",
         "socket",
         "sound",
         "spine",
