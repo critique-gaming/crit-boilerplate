@@ -13,6 +13,7 @@ local h_key_lsuper = hash("key_lsuper")
 local h_key_rsuper = hash("key_rsuper")
 
 local h_key_f4 = hash("key_f4")
+local h_key_f11 = hash("key_f11")
 local h_key_p = hash("key_p")
 local h_key_grave = hash("key_grave")
 local h_key_enter = hash("key_enter")
@@ -45,11 +46,9 @@ local wrapped_on_input = analog_to_digital.wrap_on_input(function (self, action_
       return true
     end
 
-  elseif action_id == h_key_enter then
-    if action.pressed and held_keys.alt and defos then
-      defos.toggle_fullscreen()
-      return true
-    end
+  elseif action.pressed and ((action_id == h_key_enter and held_keys.alt) or action_id == h_key_f11) then
+    defos.toggle_fullscreen()
+    return true
 
   elseif sys_config.debug then
     if action_id == h_key_grave then
