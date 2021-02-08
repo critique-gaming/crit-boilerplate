@@ -55,7 +55,7 @@ jobs:
       working-directory: repo
 
     - name: Upload builds to S3
-      run: 'aws s3 sync repo/app/dist/package s3://${{ secrets.S3_BUCKET_BUILDS }}/$(./deploy.lua_ props title)/$(cat dist/package/VERSION.txt)'
+      run: 'aws s3 sync dist/package s3://${{ secrets.S3_BUCKET_BUILDS }}/$(./deploy.lua_ props title)/$(cat dist/package/VERSION.txt)'
       working-directory: 'repo'
 
   build-ios:
@@ -102,5 +102,5 @@ jobs:
       working-directory: repo
 
     - name: Upload builds to S3
-      run: 'aws s3 sync repo/app/dist/package s3://${{ secrets.S3_BUCKET_BUILDS }}/$(./deploy.lua_ props title)/$(cat dist/package/VERSION.txt)'
+      run: 'aws s3 sync dist/package s3://${{ secrets.S3_BUCKET_BUILDS }}/$(./deploy.lua_ props title)/$(cat dist/package/VERSION.txt)'
       working-directory: 'repo'
