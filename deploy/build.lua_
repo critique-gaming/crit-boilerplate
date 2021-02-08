@@ -190,6 +190,7 @@ local function build(platform, output_dir, options)
   local bob_args = {
     "--platform", platform_name, "--archive", "-bo", output_dir, "--variant=" .. variant,
     "--with-symbols",
+    "--exclude-build-folder", "dist,deploy,doc,docs",
     "distclean", "build", "bundle"
   }
 
