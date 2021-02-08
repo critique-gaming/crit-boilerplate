@@ -4,15 +4,22 @@ local M = {}
 M.id = "props"
 
 function M.parser_config(parser)
-  local cmd = parser:command("props", "Get project properties")
-  cmd:argument("prop", "A project property name (from project.lua_). Eg. ini.project.title")
+  local cmd = parser:command("props",
+    "Print out project properties. " ..
+    "Will exit with exit code 1 if the property is not found."
+  )
+  cmd:argument("path",
+    "Path to a property in dot-notation.\n" ..
+    "See read_project() from project.lua_ for all available fields.\n" ..
+    "Eg. ini.project.title"
+  )
 end
 
 function M.run(args)
   local read_project = require("deploy.project")
   local item = read_project()
 
-  for pathname in util.split(args.prop, "%.") do
+  for pathname in util.split(args.path, "%.") do
     if type(item) ~= "table" then
       item = nil
       break
