@@ -3,7 +3,7 @@
 .externalToolBuilders
 .DS_Store
 .lock-wscript
-build
+/build
 *.pyc
 .project
 .cproject
