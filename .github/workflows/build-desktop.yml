@@ -52,8 +52,9 @@ jobs:
       run: 'lua deploy.lua_ package --debug --version-suffix .debug --skip-notarize'
       working-directory: 'repo'
 
-    - name: Upload debug builds to S3
-      run: 'aws s3 sync repo/app/dist/package s3://${{ secrets.S3_BUCKET_BUILDS }}/${./deploy.lua_ props title)/$(cat repo/app/dist/package/VERSION.txt)'
+    - name: Upload builds to S3
+      run: 'aws s3 sync repo/app/dist/package s3://${{ secrets.S3_BUCKET_BUILDS }}/$(./deploy.lua_ props title)/$(cat dist/package/VERSION.txt)'
+      working-directory: 'repo'
 
   build-release:
     # runs-on: macos-latest
@@ -93,5 +94,6 @@ jobs:
       run: 'lua deploy.lua_ package --skip-notarize'
       working-directory: 'repo'
 
-    - name: Upload debug builds to S3
-      run: 'aws s3 sync repo/app/dist/package s3://${{ secrets.S3_BUCKET_BUILDS }}/${./deploy.lua_ props title)/$(cat repo/app/dist/package/VERSION.txt)'
+    - name: Upload builds to S3
+      run: 'aws s3 sync repo/app/dist/package s3://${{ secrets.S3_BUCKET_BUILDS }}/$(./deploy.lua_ props title)/$(cat dist/package/VERSION.txt)'
+      working-directory: 'repo'
