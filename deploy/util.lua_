@@ -76,6 +76,20 @@ local function rmdir(p)
   end)
 end
 
+local function split(s, pattern)
+  return coroutine.wrap(function ()
+    local last_end
+    local pat = "(.-)" .. pattern
+    while true do
+      local start, end_, capture = s:find(pat, last_end)
+      if not start then break end
+      coroutine.yield(capture)
+      last_end = end_ + 1
+    end
+    coroutine.yield(s:sub(last_end or 1))
+  end)
+end
+
 return {
   read_file = read_file,
   write_file = write_file,
@@ -84,4 +98,5 @@ return {
   set_ini = set_ini,
   add_settings_file = add_settings_file,
   rmdir = rmdir,
+  split = split,
 }

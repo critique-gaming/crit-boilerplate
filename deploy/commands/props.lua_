@@ -1,0 +1,22 @@
+local util = require "deploy.util"
+local M = {}
+
+M.id = "props"
+
+function M.parser_config(parser)
+  local cmd = parser:command("props", "Get project properties")
+  cmd:argument("prop", "A project property name (from project.lua_). Eg. ini.project.title")
+end
+
+function M.run(args)
+  local read_project = require("deploy.project")
+  local project = read_project()
+
+  for pathname in util.split(args.prop, "%.") do
+    project = project[pathname]
+  end
+
+  io.write(tostring(project))
+end
+
+return M

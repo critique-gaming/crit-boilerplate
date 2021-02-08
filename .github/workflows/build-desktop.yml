@@ -1,18 +1,22 @@
-name: Build for macOS, Windows and Linux
+name: Build for macOS, Windows and Linux, then upload to S3
 on:
   workflow_dispatch:
   push:
     branches: [dist-desktop]
 
 env:
-  MAC_IDENTITY: ${{ secrets.MAC_IDENTITY }}
-  APPLE_ID: ${{ secrets.APPLE_ID }}
-  APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
-  ASC_PROVIDER: ${{ secrets.ASC_PROVIDER }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  # MAC_IDENTITY: ${{ secrets.MAC_IDENTITY }}
+  # APPLE_ID: ${{ secrets.APPLE_ID }}
+  # APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+  # ASC_PROVIDER: ${{ secrets.ASC_PROVIDER }}
 
 jobs:
   build:
-    runs-on: macos-latest
+    # runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -38,29 +42,25 @@ jobs:
     - name: Install LuaFileSystem
       run: 'luarocks install luafilesystem'
 
-    - name: Import Code-signing certs
-      uses: apple-actions/import-codesign-certs@v1
-      with: 
-        p12-file-base64: ${{ secrets.APPLE_CERTIFICATES_P12 }}
-        p12-password: ${{ secrets.APPLE_CERTIFICATES_P12_PASSWORD }}
+    # - name: Import Code-signing certs
+    #   uses: apple-actions/import-codesign-certs@v1
+    #   with: 
+    #     p12-file-base64: ${{ secrets.APPLE_CERTIFICATES_P12 }}
+    #     p12-password: ${{ secrets.APPLE_CERTIFICATES_P12_PASSWORD }}
 
     - name: Make debug builds
-      run: 'cd repo && lua deploy.lua_ package --debug --version-suffix .debug --skip-notarize'
+      run: 'lua deploy.lua_ package --debug --version-suffix .debug --skip-notarize'
+      working-directory: 'repo'
 
-    - name: Archive debug builds
-      uses: actions/upload-artifact@v2
-      with:
-        name: debug
-        path: repo/dist/package
+    - name: Upload debug builds to S3
+      run: 'aws s3 sync repo/app/dist/package s3://${{ secrets.S3_BUCKET_BUILDS }}/${./deploy.lua_ props title)/$(cat repo/app/dist/package/VERSION.txt)'
 
     - name: Cleanup package dir
-      run: rm -rf repo/dist/package
+      run: 'rm -rf repo/dist/package'
 
     - name: Make release builds
-      run: 'cd repo && lua deploy.lua_ package'
+      run: 'lua deploy.lua_ package --skip-notarize'
+      working-directory: 'repo'
 
-    - name: Archive release builds
-      uses: actions/upload-artifact@v2
-      with:
-        name: release
-        path: repo/dist/package
+    - name: Upload release builds to S3
+      run: 'aws s3 sync repo/app/dist/package s3://${{ secrets.S3_BUCKET_BUILDS }}/${./deploy.lua_ props title)/$(cat repo/app/dist/package/VERSION.txt)'
