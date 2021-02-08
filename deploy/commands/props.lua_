@@ -10,13 +10,21 @@ end
 
 function M.run(args)
   local read_project = require("deploy.project")
-  local project = read_project()
+  local item = read_project()
 
   for pathname in util.split(args.prop, "%.") do
-    project = project[pathname]
+    if type(item) ~= "table" then
+      item = nil
+      break
+    end
+    item = item[pathname]
   end
 
-  io.write(tostring(project))
+  if item == nil then
+    os.exit(1)
+  end
+
+  io.write(tostring(item))
 end
 
 return M
