@@ -270,6 +270,7 @@ local function build(platform, output_dir, options)
       if ok_ then
         print("Contents of " .. log_fname .. ":")
         io.write(log_data)
+        io.flush()
       end
     end)
 
