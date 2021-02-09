@@ -32,7 +32,7 @@ jobs:
       uses: dapetcu21/setup-defold@v3.0.2
 
     - name: Setup LuaJIT
-      uses: leafo/gh-actions-lua@v8.0.0
+      uses: dapetcu21/gh-actions-lua@v9.0.0
       with:
         luaVersion: 'luajit'
 
@@ -74,7 +74,7 @@ jobs:
       uses: dapetcu21/setup-defold@v3.0.2
 
     - name: Setup LuaJIT
-      uses: leafo/gh-actions-lua@v8.0.0
+      uses: dapetcu21/gh-actions-lua@v9.0.0
       with:
         luaVersion: 'luajit'
 
