@@ -1,10 +1,10 @@
 local path = require("path")
 local shell = require("shell")
-local read_project = require("deploy.project")
-local notarize = require("deploy.notarize")
-local dotenv = require("deploy.dotenv")
-local util = require("deploy.util")
-local api = require("deploy.api")
+local read_project = require("deploy.src.project")
+local notarize = require("deploy.src.notarize")
+local dotenv = require("deploy.src.dotenv")
+local util = require("deploy.src.util")
+local api = require("deploy.src.api")
 
 local function gog_upload(branch, platforms, build_dir, options)
   print("Building for GOG branch \"" .. branch .. "\"...")
@@ -33,7 +33,7 @@ local function gog_upload(branch, platforms, build_dir, options)
   platforms = platforms or { "mac", "windows", "linux" }
 
   if not options.skip_build then
-    local build = require("deploy.build")
+    local build = require("deploy.src.build")
     local mac_app_path, notarization_request_uuid
     for _, platform in ipairs(platforms) do
       local build_output = path.join(build_dir, platform)
@@ -55,7 +55,7 @@ local function gog_upload(branch, platforms, build_dir, options)
   for _, platform in ipairs(platforms) do
     local project_path = path.join(build_dir, platform .. ".json")
     util.template(
-      path.join("deploy", "gog", "products", build_options.gog_product, platform .. ".json"),
+      path.join("deploy", "src", "gog", "products", build_options.gog_product, platform .. ".json"),
       project_path,
       template_args
     )

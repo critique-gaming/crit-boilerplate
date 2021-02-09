@@ -1,7 +1,7 @@
 local project = nil
 
 local function get_commit_hash()
-  local shell = require("deploy.lib.shell")
+  local shell = require("deploy.src.lib.shell")
   local commit = shell.read({ "git", "show", "-s", "--format=%H" }) or ""
   return commit:match("^%s*(%S%S%S%S%S%S%S%S)")
 end

@@ -8,7 +8,7 @@ function M.arg_config(cmd)
 end
 
 function M.setup(args)
-  local dotenv = require("deploy.dotenv")
+  local dotenv = require("deploy.src.dotenv")
   if args.bob then
     dotenv.setenv("BOB", args.bob)
   end
@@ -49,7 +49,7 @@ function M.custom_parse(parser, args)
       bob_args[#bob_args + 1] = "--help"
     end
 
-    local bob = require("deploy.bob")
+    local bob = require("deploy.src.bob")
     bob.run(bob_args)
 
     return true

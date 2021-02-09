@@ -3,8 +3,8 @@ local M = {}
 M.id = "cmd_resolve"
 
 function M.arg_config(cmd)
-  require("deploy.commands.bob").arg_config(cmd)
-  local dotenv = require("deploy.dotenv")
+  require("deploy.src.commands.bob").arg_config(cmd)
+  local dotenv = require("deploy.src.dotenv")
   cmd:option("--defoldsdk", "Hash to a particular DefoldSDK version", dotenv.getenv("DEFOLDSDK"))
 end
 
@@ -14,8 +14,8 @@ function M.parser_config(parser)
 end
 
 function M.run(args)
-  require("deploy.commands.bob").setup(args)
-  local bob = require("deploy.bob")
+  require("deploy.src.commands.bob").setup(args)
+  local bob = require("deploy.src.bob")
   bob.resolve()
 end
 

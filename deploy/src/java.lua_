@@ -1,5 +1,5 @@
 local M = {}
-local dotenv = require("deploy.dotenv")
+local dotenv = require("deploy.src.dotenv")
 local path = require("path")
 
 local java_home = dotenv.getenv("JAVA_HOME")

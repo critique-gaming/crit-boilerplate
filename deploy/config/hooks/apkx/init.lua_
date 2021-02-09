@@ -1,5 +1,5 @@
-local api = require("deploy.api")
-local util = require("deploy.util")
+local api = require("deploy.src.api")
+local util = require("deploy.src.util")
 
 api.register_hook("build:arg_config_mobile", function (cmd)
   cmd:option("--apkx-main-version", "APK Expansion main file version")

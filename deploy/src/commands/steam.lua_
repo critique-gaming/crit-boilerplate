@@ -2,10 +2,10 @@ local M = {}
 
 M.id = "cmd_steam"
 
-local cmd_build = require "deploy.commands.build"
+local cmd_build = require "deploy.src.commands.build"
 
 function M.parser_config(parser)
-  local dotenv = require("deploy.dotenv")
+  local dotenv = require("deploy.src.dotenv")
   local cmd = parser:command("steam", "Build and upload game to Steam"):target("cmd_steam")
   cmd:argument("branch", "The branch to build to. Omit to build all branches" ):args("?")
   cmd:flag("--skip-build", "Skip building (just upload)")
@@ -22,10 +22,10 @@ end
 function M.run(args)
   cmd_build.setup(args)
 
-  local steam = require("deploy.steam")
+  local steam = require("deploy.src.steam")
   steam.with_hooks(function ()
     if not args.skip_resolve and not args.skip_build and not args.test_login then
-      local bob = require("deploy.bob")
+      local bob = require("deploy.src.bob")
       bob.resolve()
     end
 

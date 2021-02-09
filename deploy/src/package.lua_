@@ -1,7 +1,7 @@
 local path = require("path")
-local read_project = require("deploy.project")
-local zip = require("deploy.zip")
-local util = require("deploy.util")
+local read_project = require("deploy.src.project")
+local zip = require("deploy.src.zip")
+local util = require("deploy.src.util")
 
 local filenames = {
   windows = "_win.zip",
@@ -52,7 +52,7 @@ local function package_build(platform, input_dir, output_dir, options)
       1
     )
 
-    local bundletool = require("deploy.bundletool")
+    local bundletool = require("deploy.src.bundletool")
     local cmd = bundletool.build_args()
     if cmd then
       local package_basename = path.splitext(package_filename)

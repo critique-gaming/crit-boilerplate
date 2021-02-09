@@ -1,10 +1,10 @@
-local bob = require("deploy.bob")
+local bob = require("deploy.src.bob")
 local path = require("path")
-local util = require("deploy.util")
+local util = require("deploy.src.util")
 local shell = require("shell")
-local read_project = require("deploy.project")
-local dotenv = require("deploy.dotenv")
-local api = require("deploy.api")
+local read_project = require("deploy.src.project")
+local dotenv = require("deploy.src.dotenv")
+local api = require("deploy.src.api")
 local inifile = require("inifile")
 
 local set_ini = util.set_ini

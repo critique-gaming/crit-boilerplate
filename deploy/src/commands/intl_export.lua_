@@ -9,7 +9,7 @@ function M.parser_config(parser)
 end
 
 function M.run(args)
-  local intl_cmd = require("deploy.intl_cmd")
+  local intl_cmd = require("deploy.src.intl_cmd")
   intl_cmd.export(args.format, args.out_dir)
 end
 

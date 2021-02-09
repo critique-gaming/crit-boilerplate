@@ -2,7 +2,7 @@ local M = {}
 
 M.id = "cmd_package"
 
-local cmd_build = require "deploy.commands.build"
+local cmd_build = require "deploy.src.commands.build"
 
 function M.parser_config(parser)
   local cmd = parser:command("package", "Package game for DRM-free distribution"):target("cmd_package")
@@ -21,7 +21,7 @@ end
 function M.run(args)
   cmd_build.run(args, function (platform, build_output)
     local path = require("path")
-    local package_build = require("deploy.package")
+    local package_build = require("deploy.src.package")
     local package_output = args.output or path.join("dist", "package")
     package_build(platform, build_output, package_output, args)
   end)

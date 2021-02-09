@@ -1,4 +1,4 @@
-local dotenv = require("deploy.dotenv")
+local dotenv = require("deploy.src.dotenv")
 
 local shell = {}
 

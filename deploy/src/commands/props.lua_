@@ -1,4 +1,4 @@
-local util = require "deploy.util"
+local util = require "deploy.src.util"
 local M = {}
 
 M.id = "props"
@@ -16,7 +16,7 @@ function M.parser_config(parser)
 end
 
 function M.run(args)
-  local read_project = require("deploy.project")
+  local read_project = require("deploy.src.project")
   local item = read_project()
 
   for pathname in util.split(args.path, "%.") do

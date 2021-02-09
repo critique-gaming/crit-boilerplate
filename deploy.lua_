@@ -2,76 +2,12 @@
 
 local sep = package.config:sub(1, 1)
 package.path = (
-  'deploy' .. sep .. 'lib' .. sep .. '?.lua;' ..
-  'deploy' .. sep .. 'lib' .. sep .. '?' .. sep .. 'init.lua;' ..
+  'deploy' .. sep .. 'src' .. sep .. 'lib' .. sep .. '?.lua;' ..
+  'deploy' .. sep .. 'src' .. sep .. 'lib' .. sep .. '?' .. sep .. 'init.lua;' ..
   '.' .. sep .. '?.lua;' ..
   '.' .. sep .. '?' .. sep .. 'init.lua;' ..
   package.path
 )
 package.path = package.path:gsub(".lua", ".lua_") .. ';' .. package.path
 
-local dotenv = require("deploy.dotenv")
-local argparse = require("argparse")
-local api = require("deploy.api")
-
-require("deploy.commands")
-require("deploy.config.hooks")
-
-local parser = argparse("deploy.lua", "Deploy script")
-parser:flag("-v --verbose", "Output verbose info")
-if dotenv.os_name == "Darwin" then
-  parser:flag("--skip-caffeinate", "Don't use caffeinate to keep the computer awake during the build")
-end
-
-for _, cmd_id in ipairs(api.commands) do
-  api.commands[cmd_id].parser_config(parser)
-end
-
-for _, cmd_id in ipairs(api.commands) do
-  local cmd = api.commands[cmd_id]
-  if cmd.custom_parse and cmd.custom_parse(parser, arg) then
-    return
-  end
-end
-
-local args = parser:parse(arg)
-
-if dotenv.os_name == "Darwin" and not args.skip_caffeinate then
-  local shell = require("deploy.lib.shell")
-
-  local caffeinate_args = { "caffeinate", "-d", "-s" }
-
-  local lowest = 1
-  while arg[lowest - 1] do
-    lowest = lowest - 1
-  end
-  for i = lowest, 0 do
-    table.insert(caffeinate_args, arg[i])
-  end
-  table.insert(caffeinate_args, "--skip-caffeinate")
-  for i = 1, #arg do
-    table.insert(caffeinate_args, arg[i])
-  end
-
-  local ok, _, code = shell.execute(caffeinate_args)
-
-  if type(ok) == "number" then
-    os.exit(ok)
-  end
-  if type(code) == "number" then
-    os.exit(code)
-  end
-  os.exit(0)
-  return
-end
-
-if args.verbose then
-  dotenv.verbose = true
-end
-
-for _, cmd_id in ipairs(api.commands) do
-  if args[cmd_id] then
-    api.commands[cmd_id].run(args)
-    return
-  end
-end
+require("deploy.src")

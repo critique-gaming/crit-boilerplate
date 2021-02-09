@@ -1,0 +1,12 @@
+local api = require "deploy.src.api"
+
+api.register_command(require("deploy.src.commands.bob"))
+api.register_command(require("deploy.src.commands.resolve"))
+api.register_command(require("deploy.src.commands.build"))
+api.register_command(require("deploy.src.commands.notarize"))
+api.register_command(require("deploy.src.commands.package"))
+api.register_command(require("deploy.src.commands.steam"))
+api.register_command(require("deploy.src.commands.gog"))
+api.register_command(require("deploy.src.commands.intl_import"))
+api.register_command(require("deploy.src.commands.intl_export"))
+api.register_command(require("deploy.src.commands.props"))

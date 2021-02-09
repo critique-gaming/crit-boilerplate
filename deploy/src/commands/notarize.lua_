@@ -3,7 +3,7 @@ local M = {}
 M.id = "cmd_notarize"
 
 function M.arg_config(cmd)
-  local dotenv = require("deploy.dotenv")
+  local dotenv = require("deploy.src.dotenv")
   cmd:option("--apple-id", "Apple ID username", dotenv.getenv("APPLE_ID"))
   cmd:option("--apple-id-password", "Apple ID password", dotenv.getenv("APPLE_ID_PASSWORD")):show_default(false)
   cmd:option("--asc-provider", "Your short Apple Developer Account team ID", dotenv.getenv("ASC_PROVIDER"))
@@ -22,12 +22,12 @@ function M.parser_config(parser)
 end
 
 function M.run(args)
-  local notarize = require("deploy.notarize")
+  local notarize = require("deploy.src.notarize")
   local path = require("path")
 
   local app_path = args.app_path
   if not app_path then
-    local read_project = require("deploy.project")
+    local read_project = require("deploy.src.project")
     app_path = path.join("dist", "build", "mac", read_project().title .. ".app")
   end
 

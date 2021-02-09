@@ -1,6 +1,6 @@
-local intl = require "deploy.intl"
+local intl = require "deploy.src.intl"
 local path = require "path"
-local util = require "deploy.util"
+local util = require "deploy.src.util"
 local read_file = util.read_file
 local write_file = util.write_file
 

@@ -2,10 +2,10 @@ local M = {}
 
 M.id = "cmd_gog"
 
-local cmd_build = require "deploy.commands.build"
+local cmd_build = require "deploy.src.commands.build"
 
 function M.parser_config(parser)
-  local dotenv = require("deploy.dotenv")
+  local dotenv = require("deploy.src.dotenv")
   local cmd = parser:command("gog", "Build and upload game to GOG.com"):target("cmd_gog")
   cmd:argument("branch", "The branch to build to. Omit to build all branches" ):args("?")
   cmd:argument("platform", "One of windows, mac, linux. Omit to build for all desktop platforms"):args("?")
@@ -21,10 +21,10 @@ end
 function M.run(args)
   cmd_build.setup(args)
 
-  local gog = require("deploy.gog")
+  local gog = require("deploy.src.gog")
   gog.with_hooks(function ()
     if not args.skip_resolve and not args.skip_build then
-      local bob = require("deploy.bob")
+      local bob = require("deploy.src.bob")
       bob.resolve()
     end
 

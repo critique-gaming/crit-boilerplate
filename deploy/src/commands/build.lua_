@@ -1,10 +1,10 @@
-local api = require("deploy.api")
+local api = require("deploy.src.api")
 
 local M = {}
 M.id = "cmd_build"
 
 function M.arg_config_mobile(cmd)
-  local dotenv = require("deploy.dotenv")
+  local dotenv = require("deploy.src.dotenv")
   cmd:option("--version-code", "Override android.version_code and ios.bundle_version in game.project")
   cmd:option("--android-keystore", "Path to an Android keystore", dotenv.getenv("ANDROID_KEYSTORE"))
   cmd:option("--android-keystore-alias", "Alias to the Android signing keypair in the keystore",
@@ -22,22 +22,22 @@ function M.arg_config_mobile(cmd)
 end
 
 function M.arg_config_mac(cmd)
-  local dotenv = require("deploy.dotenv")
+  local dotenv = require("deploy.src.dotenv")
   cmd:option("--mac-identity", "macOS certificate identity", dotenv.getenv("MAC_IDENTITY"))
   cmd:flag("--skip-notarize", "Skip notarization")
-  require("deploy.commands.notarize").arg_config(cmd)
+  require("deploy.src.commands.notarize").arg_config(cmd)
   api.run_hook("build:arg_config_mac", cmd)
 end
 
 function M.arg_config(cmd)
-  local dotenv = require("deploy.dotenv")
+  local dotenv = require("deploy.src.dotenv")
   cmd:flag("--debug", "Debug build. Release is default")
   cmd:flag("--skip-resolve", "Skip dependency resolution")
   cmd:flag("--skip-git-status", "Skip checking if the project directory is clean before building")
   cmd:flag("--no-cleanup", "Doesn't reset the repo to its original state after building with bob")
   cmd:flag("--skip-texture-compression", "Skip texture compression")
   cmd:option("--build-server", "Defold build server URL", dotenv.getenv("DEFOLD_BUILD_SERVER"))
-  require("deploy.commands.resolve").arg_config(cmd)
+  require("deploy.src.commands.resolve").arg_config(cmd)
   api.run_hook("build:arg_config", cmd)
 end
 
@@ -62,7 +62,7 @@ end
 
 function M.check_git_status_if_needed(args)
   if not args.skip_git_status then
-    local check_git_status = require("deploy.git_status")
+    local check_git_status = require("deploy.src.git_status")
     if not check_git_status() then
       print(
         "ABORTING! The project directory is unclean (according to git status). " ..
@@ -75,7 +75,7 @@ end
 
 function M.setup(args)
   M.check_git_status_if_needed(args)
-  require("deploy.commands.bob").setup(args)
+  require("deploy.src.commands.bob").setup(args)
   api.run_hook("build:setup", args)
 end
 
@@ -83,7 +83,7 @@ function M.run(args, post_build)
   M.setup(args)
 
   if not args.skip_resolve and not args.skip_build then
-    local bob = require("deploy.bob")
+    local bob = require("deploy.src.bob")
     bob.resolve(args)
   end
 
@@ -92,7 +92,7 @@ function M.run(args, post_build)
   local function package(build_output, platform)
     if not args.skip_build then
       api.run_hook("build:pre_build", platform, build_output)
-      local build = require("deploy.build")
+      local build = require("deploy.src.build")
       build(platform, build_output, args)
       api.run_hook("build:post_build", platform, build_output)
     end
@@ -102,8 +102,8 @@ function M.run(args, post_build)
     local notarization_id
     if platform == "mac" and not args.skip_notarize and args.apple_id and args.apple_id_password then
       api.run_hook("build:pre_notarize", platform, build_output)
-      notarize = require("deploy.notarize")
-      local read_project = require("deploy.project")
+      notarize = require("deploy.src.notarize")
+      local read_project = require("deploy.src.project")
       local project_title = read_project().title
       app_path = path.join(build_output, project_title .. ".app")
       notarization_id = notarize.notarize(app_path, args)

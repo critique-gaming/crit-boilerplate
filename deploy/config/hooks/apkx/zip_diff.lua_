@@ -1,4 +1,4 @@
-local zip = require "deploy.zip"
+local zip = require "deploy.src.zip"
 local path = require("path")
 
 return function (out_zip, new_zip, old_zip)
