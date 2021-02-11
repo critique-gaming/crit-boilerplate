@@ -43,12 +43,6 @@ jobs:
       with:
         luaVersion: 'luajit'
 
-    - name: Setup LuaRocks
-      uses: leafo/gh-actions-luarocks@v4.0.0
-
-    - name: Install LuaFileSystem
-      run: 'luarocks install luafilesystem'
-
     - name: Install bundletool
       run: >
         curl -L 'https://github.com/google/bundletool/releases/download/1.4.0/bundletool-all-1.4.0.jar' > bundletool.jar &&

@@ -46,12 +46,6 @@ jobs:
       with:
         luaVersion: 'luajit'
 
-    - name: Setup LuaRocks
-      uses: leafo/gh-actions-luarocks@v4.0.0
-
-    - name: Install LuaFileSystem
-      run: 'luarocks install luafilesystem'
-
     # - name: Import Code-signing certs
     #   uses: apple-actions/import-codesign-certs@v1
     #   with: 

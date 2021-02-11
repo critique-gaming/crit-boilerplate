@@ -31,12 +31,6 @@ jobs:
       with:
         luaVersion: 'luajit'
 
-    - name: Setup LuaRocks
-      uses: leafo/gh-actions-luarocks@v4.0.0
-
-    - name: Install LuaFileSystem
-      run: 'luarocks install luafilesystem'
-
     - name: Build
       run: 'lua deploy.lua_ build web'
       working-directory: 'repo'

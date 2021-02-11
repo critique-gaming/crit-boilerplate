@@ -13,8 +13,8 @@
 local DIR_SEP = package.config:sub(1,1)
 local IS_WINDOWS = DIR_SEP == '\\'
 
-local function prequire(m) 
-  local ok, err = pcall(require, m) 
+local function prequire(m)
+  local ok, err = pcall(require, m)
   if not ok then return nil, err end
   return err
 end
@@ -36,6 +36,10 @@ end
 
 if not fs then
   fs = prequire"path.lfs.fs"
+end
+
+if not fs then
+  fs = prequire"path.lfs.fs_ffi"
 end
 
 assert(fs, "you need installed LuaFileSystem or FFI/Alien (Windows only)")
