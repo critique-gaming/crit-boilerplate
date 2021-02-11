@@ -1,5 +1,5 @@
 local csv = require "csv"
-local util = require "util"
+local util = require "deploy.src.util"
 
 local function trim_final_newlines(intl_data)
   for i = #intl_data, 1, -1 do
