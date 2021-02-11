@@ -1,16 +1,20 @@
 local intl = require "deploy.src.intl"
 local path = require "path"
 local util = require "deploy.src.util"
+local api = require "deploy.src.api"
 local read_file = util.read_file
 local write_file = util.write_file
 
 local function export(format, out_dir)
   path.mkdir(out_dir)
+
   path.each(path.join("intl", "*.lua"), function (intl_file)
       local data = intl.parse("lua", read_file(intl_file))
       local filename = path.join(out_dir, path.splitext(path.basename(intl_file)) .. "." .. format)
       write_file(filename, intl.stringify(format, data))
   end)
+
+  api.run_hook("intl_export:run", format, out_dir)
 end
 
 local function import_file(filename)
