@@ -29,15 +29,16 @@ local function configure_layout(self)
 
   local projection_height = Layout.design_height
   local projection_width = viewport_width * projection_height / viewport_height
+  local projection_left = (Layout.design_width - projection_width) * 0.5
 
   Layout.set_metrics({
     window_width = window_width,
     window_height = window_height,
     viewport_width = viewport_width,
     viewport_height = viewport_height,
-    projection_left = (Layout.design_width - projection_width) * 0.5,
+    projection_left = projection_left,
     projection_bottom = 0,
-    projection_right = projection_width,
+    projection_right = projection_left + projection_width,
     projection_top = projection_height,
   })
 
