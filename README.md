@@ -30,7 +30,7 @@ other bells and whistles
 ## Global key bindings
 
 * `Alt + F4` (Windows and Linux only): Quit the game
-* `Alt + Enter`: Toggle full screen
+* `Alt + Enter` or `F11`: Toggle full screen
 * `Ctrl + Backquote` (Debug builds only): Toggle profiler
 * `Ctrl + P` (Debug builds only): Toggle physics debugger
 
