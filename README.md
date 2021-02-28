@@ -97,7 +97,7 @@ to Steam for you.
 
 ### GOG
 
-You need to assemble the [GOG Galaxy extension][https://github.com/dapetcu21/defold-gog-galaxy]
+You need to assemble the [GOG Galaxy extension](https://github.com/dapetcu21/defold-gog-galaxy)
 yourself in a private repo, add your GitHub access token to the dependency URL,
 then use the `GOG_GALAXY_DEPENDENCY_URL` environment variable when running 
 `deploy.lua_` to add the extension to your build when bundling with `deploy.lua_ gog`
