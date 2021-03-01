@@ -271,15 +271,15 @@ if OS == "Windows" then
         if not dir._dentry then
             dir._dentry = ffi.new(dir_type)
             dir._dentry.handle = findfirst(dir._pattern, entry)
-            if dir._dentry.handle == -1 then
+            if dir._dentry["handle"] == -1 then
                 dir.closed = true
                 return nil, errno()
             end
-            return ffi_str(entry.name)
+            return ffi_str(entry["name"])
         end
 
-        if findnext(dir._dentry.handle, entry) == 0 then
-            return ffi_str(entry.name)
+        if findnext(dir._dentry["handle"], entry) == 0 then
+            return ffi_str(entry["name"])
         end
         close(dir)
         return nil
@@ -673,12 +673,13 @@ local dir_lock_type = ffi.metatype(dir_lock_struct,
     }}
 )
 
+
 function _M.lock_dir(path, _)
     -- It's interesting that the lock_dir from vanilla lfs just ignores second paramter.
     -- So, I follow this behavior too :)
     local dir_lock = ffi.new(dir_lock_type)
     local lockname = path .. '/lockfile.lfs'
-    if not dir_lock:create_lockfile(path, lockname) then
+    if not dir_lock["create_lockfile"](dir_lock, path, lockname) then
         return nil, errno()
     end
     return dir_lock

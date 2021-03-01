@@ -10,6 +10,8 @@
 --
 ------------------------------------------------------------------
 
+-- luacheck: ignore
+
 local alien = require "alien"
 local autil = require "path.win32.alien.utils"
 local types = require "path.win32.alien.types"
@@ -167,7 +169,7 @@ end
 
 local function GetFileAttributesEx(u, P)
   local ret, info
-  if u then 
+  if u then
     info = WIN32_FIND_DATAW:new()
     ret = GetFileAttributesExW(P .. "\0", 0, info())
   else
@@ -306,7 +308,7 @@ local function ErrorMessage(u, dwErr, lang)
   );
 
   if ret == 0 then
-    local err = GetLastError() 
+    local err = GetLastError()
     return "", err
   end
 
@@ -352,7 +354,7 @@ local function DiskNumber(u, P)
   local Info = CTYPES.STORAGE_DEVICE_NUMBER:new();
   local Info_size = CTYPES.STORAGE_DEVICE_NUMBER.size_
 
-  local ret, dwTmp = DeviceIoControl(hPart, IOCTL_STORAGE_GET_DEVICE_NUMBER, 
+  local ret, dwTmp = DeviceIoControl(hPart, IOCTL_STORAGE_GET_DEVICE_NUMBER,
     NULL, 0, Info(), Info_size
   )
   if not ret then err = dwTmp end

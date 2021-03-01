@@ -10,6 +10,8 @@
 --
 ------------------------------------------------------------------
 
+-- luacheck: ignore
+
 local alien = require "alien"
 local autil = require "path.win32.alien.utils"
 
@@ -71,7 +73,7 @@ local WIN32_FILE_ATTRIBUTE_DATA = function(s) return {
   nFileSize        = {s.nFileSizeLow,                   s.nFileSizeHigh};
 }end;
 
-local WIN32_FIND_DATAA2LUA = function(s) 
+local WIN32_FIND_DATAA2LUA = function(s)
   local res = WIN32_FILE_ATTRIBUTE_DATA(s)
   res.cFileName = s.cFileName:gsub("%z.*$", "")
   return res

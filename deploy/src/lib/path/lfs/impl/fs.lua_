@@ -10,6 +10,8 @@
 --
 ------------------------------------------------------------------
 
+-- luacheck: ignore
+
 return function(lfs)
 local os  = require "os"
 
@@ -65,7 +67,7 @@ function _M.copy(src, dst, force)
 
   if not force then
     local t, err = io.open(dst, 'rb' )
-    if t then 
+    if t then
       f:close()
       t:close()
       return nil, "file alredy exists"
@@ -103,7 +105,7 @@ function _M.move(src, dst, flags)
     if not ok then return nil, err end
   end
   if (not IS_WINDOWS) and _M.exists(dst) then
-    -- on windows os.rename return error when dst exists, 
+    -- on windows os.rename return error when dst exists,
     -- but on linux its just replace existed file
     return nil, "destination alredy exists"
   end
@@ -159,7 +161,7 @@ end
 foreach_impl = function(base, match, callback, option)
   local tmp, origin_cb
   if option.delay then
-    tmp, origin_cb, callback = {}, callback, function(base,name,fd) 
+    tmp, origin_cb, callback = {}, callback, function(base,name,fd)
       table.insert(tmp, {base,name,fd})
     end;
   end
@@ -214,7 +216,7 @@ end
 local function filePat2rexPat(pat)
   if pat:find("[*?]") then
     local post = '$'
-    if pat:find("*", 1, true) then 
+    if pat:find("*", 1, true) then
       if pat:find(".", 1, true) then post = '[^.]*$'
       else post = '' end
     end
@@ -256,7 +258,7 @@ local attribs = {
 
 local function make_attrib(str)
   local t = {}
-  for i = 1, #str do 
+  for i = 1, #str do
     local ch = str:sub(i,i)
     local fn = attribs[ ch ]
     if not fn then return nil, 'unknown file attribute: ' .. ch end
@@ -287,7 +289,7 @@ function _M.each_impl(option)
   local filter = option.filter
 
   if option.callback then
-    local callback = option.callback 
+    local callback = option.callback
 
     local function cb(base, name, fd)
       local params = assert(get_params(base, name, fd))
@@ -364,7 +366,7 @@ local function match_pat_selftest()
 
   local function test_match(pat, t)
     local cmp = match_pat(pat)
-    for fname, status in pairs(t) do 
+    for fname, status in pairs(t) do
       if status ~= cmp(fname) then
         io.write("Pat: ", pat, " Name: ", fname, " Expected: ", tostring(status), " Got: ", tostring(cmp(fname)), "\n")
       end

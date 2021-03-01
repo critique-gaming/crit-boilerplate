@@ -10,6 +10,8 @@
 --
 ------------------------------------------------------------------
 
+-- luacheck: ignore
+
 local ffi   = require "ffi"
 local types = require "path.win32.ffi.types"
 
@@ -115,7 +117,7 @@ end
 
 local function GetFileAttributesEx(u, P)
   local ret, info
-  if u then 
+  if u then
     info = WIN32_FIND_DATAW()
     ret = C.GetFileAttributesExW(P .. "\0", C.GetFileExInfoStandard, info)
   else
@@ -263,7 +265,7 @@ local function ErrorMessage(u, dwErr, lang)
   );
 
   if ret == 0 then
-    local err = C.GetLastError() 
+    local err = C.GetLastError()
     return "", err
   end
 
@@ -312,7 +314,7 @@ local function DiskNumber(u, P)
   local Info = CTYPES.STORAGE_DEVICE_NUMBER();
   local Info_size = ffi.sizeof(CTYPES.STORAGE_DEVICE_NUMBER)
 
-  local ret, dwTmp = DeviceIoControl(hPart, IOCTL_STORAGE_GET_DEVICE_NUMBER, 
+  local ret, dwTmp = DeviceIoControl(hPart, IOCTL_STORAGE_GET_DEVICE_NUMBER,
     NULL, 0, Info, Info_size
   )
   if not ret then err = dwTmp end

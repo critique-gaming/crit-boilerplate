@@ -10,6 +10,8 @@
 --
 ------------------------------------------------------------------
 
+-- luacheck: ignore
+
 --[[ note GetTempPath
 GetTempPath() might ignore the environment variables it's supposed to use (TEMP, TMP, ...) if they are more than 130 characters or so.
 http://blogs.msdn.com/b/larryosterman/archive/2010/10/19/because-if-you-do_2c00_-stuff-doesn_2700_t-work-the-way-you-intended_2e00_.aspx
@@ -45,7 +47,7 @@ lua_version = function()
     local maj, min = version:match("^Lua (%d+)%.(%d+)$")
     if maj then                         lua_version_t = {tonumber(maj),tonumber(min)}
     elseif math.type    then            lua_version_t = {5,3}
-    elseif not math.mod then            lua_version_t = {5,2}
+    elseif not math["mod"] then            lua_version_t = {5,2}
     elseif table.pack and not _G.pack then lua_version_t = {5,2}
     else                                lua_version_t = {5,2} end
   end

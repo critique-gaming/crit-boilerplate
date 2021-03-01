@@ -10,6 +10,8 @@
 --
 ------------------------------------------------------------------
 
+-- luacheck: ignore
+
 local alien = require "alien"
 
 local STRUCT = {}

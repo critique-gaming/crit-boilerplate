@@ -13,6 +13,8 @@
 ---
 -- Implementation of afx.findfile
 
+-- luacheck: ignore
+
 local string    = require "string"
 local table     = require "table"
 local coroutine = require "coroutine"
@@ -57,7 +59,7 @@ local function load(findfile_t)
   end
 
   local function findfile(p1,p2,p3,p4)
-    if type(p1) == 'string' then 
+    if type(p1) == 'string' then
       if type(p2) == 'string' then
         if type(p3) == 'function' then
           return findfile_ssf(p1,p2,p3,p4)

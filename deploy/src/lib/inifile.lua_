@@ -44,6 +44,7 @@ local backends = {
 	},
 }
 
+local love = _G.love
 if love then
 	backends.love = {
 		lines = love.filesystem.lines,

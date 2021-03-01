@@ -10,6 +10,8 @@
 --
 ------------------------------------------------------------------
 
+-- luacheck: ignore
+
 local ffi = require("ffi")
 ffi.cdef[[
   int __stdcall MultiByteToWideChar(unsigned int cp, uint32_t flag, const char* src, int srclen, wchar_t* dst, int dstlen);
@@ -69,7 +71,7 @@ local function MultiByteToWideChar(src, cp)
   local dst = ffi.new(awchar_t, buflen + 1) -- eos
   local ret = C.MultiByteToWideChar(cp, 0, src, #src, dst, buflen)
   if ret < 0 then return nil, C.GetLastError() end
-  if ret <= buflen then 
+  if ret <= buflen then
     dst[ret] = 0
     return dst, ret
   end
@@ -85,7 +87,7 @@ local function WideCharToMultiByte(src, cp)
   while true do
     local dst = ffi.new("char[?]", buflen + 1) -- eof
     local ret = ffi.C.WideCharToMultiByte(cp, 0, src, srclen, dst, buflen, nil, nil)
-    if ret <= 0 then 
+    if ret <= 0 then
       local err = C.GetLastError()
       if err == ERROR_INSUFFICIENT_BUFFER then
         buflen = math.ceil(1.5 * buflen)
@@ -93,7 +95,7 @@ local function WideCharToMultiByte(src, cp)
         return nil, err
       end
     else
-      if ret <= buflen then 
+      if ret <= buflen then
         return dst, ret
       end
     end

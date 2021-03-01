@@ -19,7 +19,7 @@ local function prequire(m)
   return err
 end
 
-local fs
+local fs = nil
 
 if not fs and IS_WINDOWS then
   local winfs = prequire"path.win32.fs"

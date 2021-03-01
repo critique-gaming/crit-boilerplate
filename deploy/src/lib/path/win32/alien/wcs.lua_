@@ -10,6 +10,8 @@
 --
 ------------------------------------------------------------------
 
+-- luacheck: ignore
+
 local alien = require "alien"
 local kernel32 = assert(alien.load("kernel32.dll"))
 local MultiByteToWideChar_ = assert(kernel32.MultiByteToWideChar)
@@ -30,7 +32,7 @@ MultiByteToWideChar_:types{abi="stdcall", ret = "int",
 }
 
 --int __stdcall WideCharToMultiByte(UINT cp, DWORD flag, const wchar_t* src, int srclen, char* dst, int dstlen, const char* defchar, int* used);
-WideCharToMultiByte_:types{abi="stdcall", ret = "int", 
+WideCharToMultiByte_:types{abi="stdcall", ret = "int",
   "int",     -- cp
   DWORD,     -- flag
   "string",  -- src (const wchar_t*)
@@ -75,7 +77,7 @@ local function MultiByteToWideChar(src, cp)
   local dst    = alien.buffer( WCHAR_SIZE * (buflen + 1) ) -- eos
   local ret = MultiByteToWideChar_(cp, 0, src, #src, dst, buflen)
   if ret < 0 then return nil, GetLastError() end
-  if ret <= buflen then 
+  if ret <= buflen then
     dst[ret * WCHAR_SIZE    ] = 0
     dst[ret * WCHAR_SIZE + 1] = 0
     return dst, ret
@@ -92,7 +94,7 @@ local function WideCharToMultiByte(src, cp)
   while true do
     local dst = alien.buffer(buflen + 1) -- eof
     local ret = WideCharToMultiByte_(cp, 0, src, srclen, dst, buflen, nil, nil)
-    if ret <= 0 then 
+    if ret <= 0 then
       local err = GetLastError()
       if err == 122 then -- buffer too small
         buflen = math.ceil(1.5 * buflen)
@@ -100,7 +102,7 @@ local function WideCharToMultiByte(src, cp)
         return nil, err
       end
     else
-      if ret <= buflen then 
+      if ret <= buflen then
         return dst, ret
       end
     end

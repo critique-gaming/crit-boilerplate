@@ -10,6 +10,8 @@
 --
 ------------------------------------------------------------------
 
+-- luacheck: ignore
+
 local ffi = require "ffi"
 
 local C = ffi.C
@@ -53,9 +55,9 @@ ffi.cdef [[
 ]]
 
 pcdef(pack(1, [[ // GET_FILEEX_INFO_LEVELS
-  typedef enum _GET_FILEEX_INFO_LEVELS { 
+  typedef enum _GET_FILEEX_INFO_LEVELS {
     GetFileExInfoStandard,
-    GetFileExMaxInfoLevel 
+    GetFileExMaxInfoLevel
   } GET_FILEEX_INFO_LEVELS;
 ]]))
 
@@ -129,7 +131,7 @@ local CTYPES = {
   STORAGE_DEVICE_NUMBER     = ffi.typeof("STORAGE_DEVICE_NUMBER");
 }
 
-local c2lua 
+local c2lua
 c2lua = {
 
   WIN32_FILE_ATTRIBUTE_DATA = function(s) return {
@@ -140,7 +142,7 @@ c2lua = {
     nFileSize        = {s.nFileSizeLow,                   s.nFileSizeHigh};
   }end;
 
-  WIN32_FIND_DATAA = function(s) 
+  WIN32_FIND_DATAA = function(s)
     local res = c2lua.WIN32_FILE_ATTRIBUTE_DATA(s)
     res.cFileName = ffi.string(s.cFileName);
     return res
