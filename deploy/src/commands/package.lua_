@@ -22,7 +22,7 @@ function M.run(args)
   cmd_build.run(args, function (platform, build_output)
     local path = require("path")
     local package_build = require("deploy.src.package")
-    local package_output = args.output or path.join("dist", "package")
+    local package_output = args.output or path.join(_G.project_dir or ".", "dist", "package")
     package_build(platform, build_output, package_output, args)
   end)
 end

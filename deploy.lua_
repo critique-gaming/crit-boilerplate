@@ -1,13 +1,16 @@
 #!/usr/bin/env lua
 
 local sep = package.config:sub(1, 1)
+local project_dir = debug and debug.getinfo(1).source:match("^@(.*)" .. sep .. "[^" .. sep .. "]+$") or "."
+
 package.path = (
-  'deploy' .. sep .. 'src' .. sep .. 'lib' .. sep .. '?.lua;' ..
-  'deploy' .. sep .. 'src' .. sep .. 'lib' .. sep .. '?' .. sep .. 'init.lua;' ..
-  '.' .. sep .. '?.lua;' ..
-  '.' .. sep .. '?' .. sep .. 'init.lua;' ..
+  project_dir .. sep .. 'deploy' .. sep .. 'src' .. sep .. 'lib' .. sep .. '?.lua;' ..
+  project_dir .. sep .. 'deploy' .. sep .. 'src' .. sep .. 'lib' .. sep .. '?' .. sep .. 'init.lua;' ..
+  project_dir .. sep .. '?.lua;' ..
+  project_dir .. sep .. '?' .. sep .. 'init.lua;' ..
   package.path
 )
 package.path = package.path:gsub(".lua", ".lua_") .. ';' .. package.path
 
+_G.project_dir = project_dir
 require("deploy.src")

@@ -124,15 +124,17 @@ function M.run(args, post_build)
     end
   end
 
+  local project_dir = _G.project_dir or "."
+
   if args.platform then
-    package(args.build_output or path.join("dist", "build", args.platform), args.platform)()
+    package(args.build_output or path.join(project_dir, "dist", "build", args.platform), args.platform)()
 
   else
     local platforms = { "mac", "windows", "linux" }
     local finish = {}
     for _, platform in ipairs(platforms) do
       finish[#finish + 1] = package(
-        path.join(args.build_output or path.join("dist", "build"), platform),
+        path.join(args.build_output or path.join(project_dir, "dist", "build"), platform),
         platform
       )
     end

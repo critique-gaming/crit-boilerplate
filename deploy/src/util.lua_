@@ -46,7 +46,7 @@ end
 
 local function add_settings_file(bob_args, filename, debug)
   local path = require("path")
-  local fpath = path.join("deploy", "config", "project_properties", filename)
+  local fpath = path.join(_G.project_dir or ".", "deploy", "config", "project_properties", filename)
 
   local general_file = fpath .. ".ini"
   if path.isfile(general_file) then

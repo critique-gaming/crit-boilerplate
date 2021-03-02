@@ -1,8 +1,10 @@
 local project = nil
 
+local project_dir = _G.project_dir or "."
+
 local function get_commit_hash()
   local shell = require("deploy.src.lib.shell")
-  local commit = shell.read({ "git", "show", "-s", "--format=%H" }) or ""
+  local commit = shell.read({ "git", "show", "-C", project_dir, "-s", "--format=%H" }) or ""
   return commit:match("^%s*(%S%S%S%S%S%S%S%S)")
 end
 
@@ -10,7 +12,8 @@ local function read_project()
   if project then return project end
 
   local inifile = require("inifile")
-  local ini = inifile.parse("game.project")
+  local path = require("path")
+  local ini = inifile.parse(path.join(project_dir, "game.project"))
 
   project = {
     ini = ini,

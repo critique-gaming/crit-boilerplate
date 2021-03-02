@@ -28,12 +28,14 @@ function M.run(args)
       bob.resolve()
     end
 
+    local project_dir = _G.project_dir or "."
+
     local path = require("path")
     if args.branch then
-      local build_dir = args.build_output or path.join("dist", "gog", args.branch)
+      local build_dir = args.build_output or path.join(project_dir, "dist", "gog", args.branch)
       gog.gog_upload(args.branch, args.platform and { args.platform }, build_dir, args)
     else
-      local build_dir = path.join(args.build_output or path.join("dist", "gog"))
+      local build_dir = path.join(args.build_output or path.join(project_dir, "dist", "gog"))
       gog.gog_upload_all(build_dir, args)
     end
   end)

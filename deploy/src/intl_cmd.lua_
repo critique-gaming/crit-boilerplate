@@ -5,10 +5,12 @@ local api = require "deploy.src.api"
 local read_file = util.read_file
 local write_file = util.write_file
 
+local project_dir = _G.project_dir or "."
+
 local function export(format, out_dir)
   path.mkdir(out_dir)
 
-  path.each(path.join("intl", "*.lua"), function (intl_file)
+  path.each(path.join(project_dir, "intl", "*.lua"), function (intl_file)
       local data = intl.parse("lua", read_file(intl_file))
       local filename = path.join(out_dir, path.splitext(path.basename(intl_file)) .. "." .. format)
       write_file(filename, intl.stringify(format, data))
@@ -31,7 +33,7 @@ local function import_file(filename)
 
   local new_data = intl.parse(ext, read_file(filename))
 
-  local target_path = path.join("intl", basename .. ".lua")
+  local target_path = path.join(project_dir, "intl", basename .. ".lua")
 
   local ok, old_raw_data = pcall(function () return read_file(target_path) end)
   if ok then

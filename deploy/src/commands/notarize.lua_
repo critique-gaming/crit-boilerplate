@@ -28,7 +28,7 @@ function M.run(args)
   local app_path = args.app_path
   if not app_path then
     local read_project = require("deploy.src.project")
-    app_path = path.join("dist", "build", "mac", read_project().title .. ".app")
+    app_path = path.join(_G.project_dir or ".", "dist", "build", "mac", read_project().title .. ".app")
   end
 
   if not args.just_staple then

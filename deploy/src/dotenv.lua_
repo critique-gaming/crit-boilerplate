@@ -12,10 +12,11 @@ end
 M.os_name = os_name
 
 local fs = require("path.fs")
+local path = require("path")
 
 local env = {}
 
-local dotenv_path = ".deploy_env"
+local dotenv_path = path.join(_G.project_dir or ".", ".deploy_env")
 if fs.isfile(dotenv_path) then
   env = dofile(dotenv_path) or {}
 end

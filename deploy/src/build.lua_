@@ -8,6 +8,7 @@ local api = require("deploy.src.api")
 local inifile = require("inifile")
 
 local set_ini = util.set_ini
+local project_dir = _G.project_dir or "."
 
 local platforms = {
   mac = "x86_64-darwin",
@@ -63,7 +64,7 @@ local function edit_game_project(context)
 end
 
 local function write_env_lua()
-  local env_lua_path = path.join("_env", "env.lua")
+  local env_lua_path = path.join(project_dir, "_env", "env.lua")
 
   local original_env_str
   local env_lua = io.open(env_lua_path, "r")
@@ -93,7 +94,7 @@ local function run_codesign(item, identity)
     "--options", "runtime",
     "--timestamp",
     "--no-strict",
-    "--entitlements", path.join("deploy", "config", "manifests", "mac", "entitlements.plist"),
+    "--entitlements", path.join(project_dir, "deploy", "config", "manifests", "mac", "entitlements.plist"),
     item
   })
 end
@@ -140,8 +141,8 @@ local function build(platform, output_dir, options)
     error("Unsupported platform: " .. platform)
   end
 
-  rmdir("build")
-  rmdir(path.join(".internal", "cache"))
+  rmdir(path.join(project_dir, "build"))
+  rmdir(path.join(project_dir, ".internal", "cache"))
   rmdir(output_dir)
   path.mkdir(output_dir)
 
@@ -188,6 +189,7 @@ local function build(platform, output_dir, options)
 
   local variant = options.debug and "debug" or "release"
   local bob_args = {
+    "-r", project_dir,
     "--platform", platform_name, "--archive", "-bo", output_dir, "--variant=" .. variant,
     "--with-symbols",
     "--exclude-build-folder", "dist,deploy,doc,docs",
@@ -262,7 +264,7 @@ local function build(platform, output_dir, options)
   end)
 
   if not ok then
-    path.each(path.join("build", "*"), function (fname, ...)
+    path.each(path.join(project_dir, "build", "*"), function (fname, ...)
       local log_fname = path.join(fname, "log.txt")
       local ok_, log_data = pcall(function ()
         return util.read_file(log_fname)

@@ -50,9 +50,10 @@ local function steam_upload(branch, build_dir, options)
     end
   end
 
+  local project_dir = _G.project_dir or "."
 
   local app_vdf
-  local branch_dir = path.join("deploy", "src", "steam", branch)
+  local branch_dir = path.join(project_dir, "deploy", "src", "steam", branch)
   path.each(path.join(branch_dir, "*.vdf"), function (vdf_filename)
     if vdf_filename:find("app_build") then
       app_vdf = vdf_filename

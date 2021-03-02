@@ -76,7 +76,8 @@ function M.inject_dependencies_string(project_str, additional_deps, removed_deps
 end
 
 function M.inject_dependencies(additional_deps, removed_deps)
-  local game_project_path = "game.project"
+  local path = require("path")
+  local game_project_path = path.join(_G.project_dir or ".", "game.project")
 
   local project_str = util.read_file(game_project_path)
   local original_project_str = project_str
@@ -97,7 +98,8 @@ end
 function M.resolve(opts)
   print("Fetching dependencies...")
 
-  local bob_args = { "--email", "foo@bar.com", "--auth", "12345", "resolve" }
+  local project_dir = _G.project_dir or "."
+  local bob_args = { "-r", project_dir, "--email", "foo@bar.com", "--auth", "12345", "resolve" }
 
   if opts and opts.defoldsdk and opts.defoldsdk ~= "" then
     bob_args[#bob_args + 1] = "--defoldsdk"

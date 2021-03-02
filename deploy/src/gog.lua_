@@ -53,9 +53,10 @@ local function gog_upload(branch, platforms, build_dir, options)
 
   print("Uploading to GOG.com branch \"" .. branch .. "\"...")
   for _, platform in ipairs(platforms) do
+    local project_dir = _G.project_dir or "."
     local project_path = path.join(build_dir, platform .. ".json")
     util.template(
-      path.join("deploy", "src", "gog", "products", build_options.gog_product, platform .. ".json"),
+      path.join(project_dir, "deploy", "src", "gog", "products", build_options.gog_product, platform .. ".json"),
       project_path,
       template_args
     )

@@ -34,12 +34,14 @@ function M.run(args)
       return
     end
 
+    local project_dir = _G.project_dir or "."
+
     local path = require("path")
     if args.branch then
-      local build_dir = args.build_output or path.join("dist", "steam", args.branch)
+      local build_dir = args.build_output or path.join(project_dir, "dist", "steam", args.branch)
       steam.steam_upload(args.branch, build_dir, args)
     else
-      local build_dir = args.build_output or path.join("dist", "steam")
+      local build_dir = args.build_output or path.join(project_dir, "dist", "steam")
       steam.steam_upload_all(build_dir, args)
     end
   end)
