@@ -1,10 +1,10 @@
 local M = {}
 
-local BinaryFormat = package.cpath:match("%p[\\|/]?%p(%a+)")
+local binary_format = package.cpath:match("%.?%.(%a+)")
 local os_name
-if BinaryFormat == "dll" then
+if binary_format == "dll" then
   os_name = "Windows"
-elseif BinaryFormat == "so" or BinaryFormat == "dylib" then
+elseif binary_format == "so" or binary_format == "dylib" then
   local f = io.popen("uname -s")
   os_name = f:read()
   f:close()
