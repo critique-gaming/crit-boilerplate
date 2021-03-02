@@ -128,8 +128,10 @@ secrets.
 
 ## Build script
 
-1. Install LuaJIT. Your OS's package manager (`apt`, `brew`, etc.) should have it.
-For Windows, [ULua](https://ulua.io) is a great prebuilt distribution.
+1. Install [LuaJIT](https://luajit.org). Your OS's package manager 
+(`apt`, `brew`, etc.) should have it. For Windows, [ULua](https://ulua.io) is 
+a great prebuilt distribution. Alternatively, plain Lua 5.1-5.4 with 
+[LuaFileSystem](https://keplerproject.github.io/luafilesystem/) will also work.
 2. Run `luajit deploy.lua_ --help` to see all the available options.
 
 Most of the options are configurable from the command line or with environment
