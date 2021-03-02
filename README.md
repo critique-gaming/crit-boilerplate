@@ -128,7 +128,9 @@ secrets.
 
 ## Build script
 
-Install LuaJIT and run `luajit deploy.lua_ --help` to see all the available options.
+1. Install LuaJIT. Your OS's package manager (`apt`, `brew`, etc.) should have it.
+For Windows, [ULua](https://ulua.io) is a great prebuilt distribution.
+2. Run `luajit deploy.lua_ --help` to see all the available options.
 
 Most of the options are configurable from the command line or with environment
 variables. You can also create a `.deploy_env` file (a Lua module which returns 
