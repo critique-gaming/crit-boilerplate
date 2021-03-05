@@ -4,7 +4,7 @@ local Button = require "crit.button"
 local analog_to_digital = require "crit.analog_to_digital"
 local cursor = require "crit.cursor"
 
-local h_click = hash("click")
+local h_touch = hash("touch")
 local h_switch_input_method = hash("switch_input_method")
 
 local gamepad_actions = {
@@ -50,7 +50,7 @@ end
 input_state.switch_input_method = switch_input_method
 
 local function on_input_(_, action_id, action)
-  if action_id == nil or action_id == h_click then
+  if action_id == nil or action_id == h_touch then
     switch_input_method(input_state.INPUT_METHOD_MOUSE)
 
   elseif gamepad_actions[action_id] and action.pressed then

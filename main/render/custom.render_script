@@ -61,13 +61,13 @@ function init(self)
   self.clear_color.z = sys.get_config("render.clear_color_blue", 0)
   self.clear_color.w = sys.get_config("render.clear_color_alpha", 0)
 
-  Button.default_sprite_action_to_position = Layout.action_to_projection
+  Button.default_sprite_action_to_position = Layout.action_to_camera
   Button.default_gui_action_to_position = Layout.action_to_offset_design
-  DragAndDrop.default_sprite_action_to_position = Layout.action_to_projection
+  DragAndDrop.default_sprite_action_to_position = Layout.action_to_camera
   DragAndDrop.default_gui_action_to_position = Layout.action_to_offset_design
   ScrollBar.default_gui_action_to_position = Layout.action_to_offset_design
   Scroll.default_go_action_to_dy = function (action)
-    return action.screen_dy * Layout.viewport_to_projection_scale_y
+    return action.screen_dy * Layout.viewport_to_camera_scale_y
   end
 
   self.view = vmath.matrix4()
