@@ -14,7 +14,7 @@ high_dpi = 1
 title = crit-boilerplate
 version = 1.0.0
 custom_resources = _env/,intl/
-dependencies = https://github.com/britzl/deftest/archive/2.7.1.zip,https://github.com/subsoap/defos/archive/v2.4.2.zip,https://github.com/britzl/monarch/archive/3.2.0.zip,https://github.com/dapetcu21/extension-safearea/archive/master.zip
+dependencies = https://github.com/britzl/deftest/archive/2.7.1.zip,https://github.com/subsoap/defos/archive/v2.4.2.zip,https://github.com/britzl/monarch/archive/3.2.0.zip,https://github.com/defold/extension-safearea/archive/1.1.0.zip
 
 [input]
 use_accelerometer = 0
@@ -50,3 +50,5 @@ app_icon_192x192 = /deploy/config/icons/android/icon_xxxhdpi.png
 version_code = 1000000
 immersive_mode = 1
 
+[safearea]
+resize_game_view = 0
