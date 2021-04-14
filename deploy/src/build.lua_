@@ -264,16 +264,18 @@ local function build(platform, output_dir, options)
   end)
 
   if not ok then
-    path.each(path.join(project_dir, "build", "*"), function (fname, ...)
-      local log_fname = path.join(fname, "log.txt")
-      local ok_, log_data = pcall(function ()
-        return util.read_file(log_fname)
+    pcall(function ()
+      path.each(path.join(project_dir, "build", "*"), function (fname, ...)
+        local log_fname = path.join(fname, "log.txt")
+        local ok_, log_data = pcall(function ()
+          return util.read_file(log_fname)
+        end)
+        if ok_ then
+          print("Contents of " .. log_fname .. ":")
+          io.write(log_data)
+          io.flush()
+        end
       end)
-      if ok_ then
-        print("Contents of " .. log_fname .. ":")
-        io.write(log_data)
-        io.flush()
-      end
     end)
 
     restore()
