@@ -19,7 +19,7 @@ local function export(format, out_dir)
   api.run_hook("intl_export:run", format, out_dir)
 end
 
-local function import_file(filename)
+local function import_file(filename, target_name)
   if not path.isfile(filename) and not path.islink(filename) then
     return
   end
@@ -33,7 +33,7 @@ local function import_file(filename)
 
   local new_data = intl.parse(ext, read_file(filename))
 
-  local target_path = path.join(project_dir, "intl", basename .. ".lua")
+  local target_path = path.join(project_dir, "intl", (target_name or basename) .. ".lua")
 
   local ok, old_raw_data = pcall(function () return read_file(target_path) end)
   if ok then
@@ -44,11 +44,13 @@ local function import_file(filename)
   write_file(target_path, intl.stringify("lua", new_data))
 end
 
-local function import(in_file_or_dir)
+local function import(in_file_or_dir, target_name)
   if path.isfile(in_file_or_dir) or path.islink(in_file_or_dir) then
-    import_file(in_file_or_dir)
+    import_file(in_file_or_dir, target_name)
   elseif path.isdir(in_file_or_dir) then
-    path.each(path.join(in_file_or_dir, "*"), "f", import_file, { recurse = true })
+    path.each(path.join(in_file_or_dir, "*"), "f", function (filename)
+      import_file(filename)
+    end, { recurse = true })
   end
 end
 

@@ -69,12 +69,6 @@ function M.modify_dependencies_string(deps_string, additional_deps, removed_deps
   return table.concat(deps, ",")
 end
 
-function M.inject_dependencies_string(project_str, additional_deps, removed_deps)
-  return project_str:gsub("(dependencies = )([^\n%s]*)", function (match_start, deps_string)
-    return match_start .. M.modify_dependencies_string(deps_string, additional_deps, removed_deps)
-  end)
-end
-
 function M.inject_dependencies(additional_deps, removed_deps)
   local path = require("path")
   local game_project_path = path.join(_G.project_dir or ".", "game.project")
@@ -82,17 +76,24 @@ function M.inject_dependencies(additional_deps, removed_deps)
   local project_str = util.read_file(game_project_path)
   local original_project_str = project_str
 
-  project_str = M.inject_dependencies_string(project_str, additional_deps, removed_deps)
+  local ini = require("deploy.src.project").parse_ini(game_project_path)
+  if ini.project and ini.project.dependencies then
+    local old_deps = ini.project.dependencies
+    local new_deps = M.modify_dependencies_string(old_deps, additional_deps, removed_deps)
 
-  if project_str == original_project_str then
-    return function () end, false
+    if new_deps ~= old_deps then
+      ini.project.dependencies = new_deps
+
+      local inifile = require("inifile")
+      inifile.save(game_project_path, ini)
+
+      return function ()
+        util.write_file(game_project_path, original_project_str)
+      end, true
+    end
   end
 
-  util.write_file(game_project_path, project_str)
-
-  return function ()
-    util.write_file(game_project_path, original_project_str)
-  end, true
+  return function () end, false
 end
 
 function M.resolve(opts)

@@ -1,6 +1,6 @@
 local path = require("path")
 local shell = require("shell")
-local read_project = require("deploy.src.project")
+local read_project = require("deploy.src.project").read_project
 local notarize = require("deploy.src.notarize")
 local dotenv = require("deploy.src.dotenv")
 local util = require("deploy.src.util")

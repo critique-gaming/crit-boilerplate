@@ -1,7 +1,7 @@
 local zip = require("deploy.src.zip")
 local path = require("path")
 local shell = require("deploy.src.lib.shell")
-local read_project = require("deploy.src.project")
+local read_project = require("deploy.src.project").read_project
 local dotenv = require("deploy.src.dotenv")
 
 local run_with_filter = function (args, filter)

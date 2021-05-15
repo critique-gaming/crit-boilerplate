@@ -16,7 +16,7 @@ function M.parser_config(parser)
 end
 
 function M.run(args)
-  local read_project = require("deploy.src.project")
+  local read_project = require("deploy.src.project").read_project
   local item = read_project()
 
   for pathname in util.split(args.path, "%.") do

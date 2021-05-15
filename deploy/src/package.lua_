@@ -1,5 +1,5 @@
 local path = require("path")
-local read_project = require("deploy.src.project")
+local read_project = require("deploy.src.project").read_project
 local zip = require("deploy.src.zip")
 local util = require("deploy.src.util")
 

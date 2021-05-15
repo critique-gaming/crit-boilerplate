@@ -21,10 +21,9 @@ local DEFAULT_BUFFER_BLOCK_SIZE = 1024 * 1024
 
 ------------------------------------------------------------------------------
 
-local function trim_space(s)
-  return s:match("^%s*(.-)%s*$")
+local function identity(s)
+  return s
 end
-
 
 local function fix_quotes(s)
   -- the sub(..., -2) is to strip the trailing quote
@@ -385,7 +384,7 @@ local function separated_values_iterator(buffer, parameters)
       if this_sep and not this_sep:match(sep) then problem("unmatched quote") end
     else
       field_end, sep_end, this_sep = field_find(sep, 1)
-      tidy = trim_space
+      tidy = identity
     end
 
     -- Look for the separator or a newline or the end of the file
