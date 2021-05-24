@@ -39,6 +39,10 @@
         ".fp": "frag",
         ".vp": "vert"
     },
+    "glsl-linter.fileExtensions": {
+        ".fp": "frag",
+        ".vp": "vert"
+    },
     "Lua.diagnostics.globals": [
         "bit",
         "buffer",
