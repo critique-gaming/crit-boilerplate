@@ -4,8 +4,8 @@
         "clientId": "${client_id}",
         "clientSecret": "${client_secret}",
         "version": "${full_version}",
-        "installDirectory": "${title}.app",
-        "name": "${title}",
+        "installDirectory": "${title_mac}.app",
+        "name": "${title_mac}",
         "platform": "osx",
         "tags": [
             "editor_v_1_4_0"
@@ -13,12 +13,12 @@
         "languageMode": "together",
         "products": [
             {
-                "name": "${title}",
+                "name": "${title_mac}",
                 "productId": "${product_id}",
                 "depots": [
                     {
                         "name": "main",
-                        "folder": "${build_dir}/mac/${title}.app",
+                        "folder": "${build_dir}/mac/${title_mac}.app",
                         "languages": [
                             "en-US"
                         ]
@@ -27,12 +27,12 @@
                 "tasks": [
                     {
                         "type": "FileTask",
-                        "name": "${title}",
+                        "name": "${title_mac}",
                         "languages": [
                             "en-US"
                         ],
                         "category": "game",
-                        "path": "Contents/MacOS/${title}",
+                        "path": "Contents/MacOS/${exe_name_mac}",
                         "isPrimary": true
                     }
                 ],

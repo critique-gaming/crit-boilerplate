@@ -1,5 +1,7 @@
 local M = {}
 
+M.project_dir = _G.project_dir or "."
+
 local commands = {}
 M.commands = commands
 

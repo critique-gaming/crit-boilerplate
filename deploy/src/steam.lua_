@@ -4,6 +4,7 @@ local read_project = require("deploy.src.project").read_project
 local notarize = require("deploy.src.notarize")
 local util = require("deploy.src.util")
 local api = require("deploy.src.api")
+local json = require("json")
 
 local function steam_upload(branch, build_dir, options)
   print("Building for Steam branch \"" .. branch .. "\"...")
@@ -16,12 +17,13 @@ local function steam_upload(branch, build_dir, options)
   local branch_config = config.branches[branch]
   assert(branch_config, "No such Steam branch defined in config: " .. branch)
 
-  local build_options = util.deep_clone(branch.build_options)
+  local build_options = util.deep_clone(branch_config.build_options)
   build_options.mac_identity = options.mac_identity
 
   path.mkdir(build_dir)
 
   local template_args = util.deep_clone(read_project())
+  template_args.branch = branch
   template_args.preview = options.preview and "1" or "0"
   template_args.full_version = template_args.full_version .. (build_options.version_suffix or "")
 
@@ -36,10 +38,10 @@ local function steam_upload(branch, build_dir, options)
     local mac_app_path, notarization_request_uuid
     for _, platform in ipairs(platforms) do
       local build_output = path.join(build_dir, platform)
-      build(platform, build_output, build_options)
+      local build_context = build(platform, build_output, build_options)
 
       if platform == "mac" and not options.skip_notarize and options.apple_id and options.apple_id_password then
-        mac_app_path = path.join(build_output, template_args.title .. ".app")
+        mac_app_path = path.join(build_output, build_context.title .. ".app")
         notarization_request_uuid = notarize.notarize(mac_app_path, options)
       end
     end
@@ -50,10 +52,17 @@ local function steam_upload(branch, build_dir, options)
     end
   end
 
+  for _, platform in ipairs(platforms) do
+    local build_output = path.join(build_dir, platform)
+    local build_context = json.decode(util.read_file(path.join(build_output, 'BUILD.json')))
+    template_args["title_" .. platform] = build_context.title
+    template_args["exe_name_" .. platform] = build_context.exe_name
+  end
+
   local project_dir = _G.project_dir or "."
 
   local app_vdf
-  local branch_dir = path.join(project_dir, "deploy", "src", "steam", branch)
+  local branch_dir = path.join(project_dir, "deploy", "src", "steam", "templates")
   path.each(path.join(branch_dir, "*.vdf"), function (vdf_filename)
     if vdf_filename:find("app_build") then
       app_vdf = vdf_filename
@@ -101,14 +110,15 @@ local function with_hooks(f)
       local config = require("deploy.config.steam")
       additional_deps[#additional_deps + 1] = dotenv.getenv("STEAMWORKS_DEPENDENCY_URL")
         or config.steamworks_dependency_url
+      return additional_deps, removed_deps
     end)
 
     api.register_hook("build:bob_args", function (bob_args, context)
-      util.add_settings_file(bob_args, "steam", context.option.debug)
+      util.add_settings_file(bob_args, "steam", context.options.debug)
     end)
 
     api.register_hook("build:game_project", function (overrides, context)
-      util.set_init(overrides, "crit", "steam", 1)
+      util.set_ini(overrides, "crit", "steam", 1)
     end)
 
     f()

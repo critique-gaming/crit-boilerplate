@@ -1,7 +1,7 @@
 local path = require("path")
-local read_project = require("deploy.src.project").read_project
 local zip = require("deploy.src.zip")
 local util = require("deploy.src.util")
+local json = require("json")
 
 local filenames = {
   windows = "_win.zip",
@@ -20,7 +20,7 @@ local function package_build(platform, input_dir, output_dir, options)
     error("Unsupported platform")
   end
 
-  local project_title = read_project().title
+  local project_title = json.decode(util.read_file(path.join(input_dir, 'BUILD.json'))).title
   filename = project_title .. filename
 
 
@@ -33,7 +33,7 @@ local function package_build(platform, input_dir, output_dir, options)
   local package_filename = path.join(public_dir, filename)
   print("Packaging output: " .. package_filename)
 
-  path.copy(path.join(input_dir, 'VERSION.txt'), path.join(output_dir, 'VERSION.txt'))
+  path.copy(path.join(input_dir, 'BUILD.json'), path.join(output_dir, 'BUILD.json'))
 
   if platform == "ios" then
     path.copy(path.join(input_dir, project_title .. ".ipa"), package_filename)
@@ -107,7 +107,7 @@ local function package_build(platform, input_dir, output_dir, options)
     path.copy(path.join(input_dir, "dmengine.pdb"), path.join(private_dir, "dmengine.pdb"))
 
   else
-    zip.create(input_dir, package_filename, nil, { '-x', 'VERSION.txt' })
+    zip.create(input_dir, package_filename, nil, { '-x', 'BUILD.json' })
 
   end
 end

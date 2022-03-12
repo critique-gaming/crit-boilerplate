@@ -102,9 +102,12 @@ function M.run(args, post_build)
     local notarization_id
     if platform == "mac" and not args.skip_notarize and args.apple_id and args.apple_id_password then
       api.run_hook("build:pre_notarize", platform, build_output)
+
       notarize = require("deploy.src.notarize")
-      local read_project = require("deploy.src.project").read_project
-      local project_title = read_project().title
+      local util = require("deploy.src.util")
+      local json = require("json")
+
+      local project_title = json.decode(util.read_file(path.join(build_output, 'BUILD.json'))).title
       app_path = path.join(build_output, project_title .. ".app")
       notarization_id = notarize.notarize(app_path, args)
     end

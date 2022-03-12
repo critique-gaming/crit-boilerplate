@@ -29,15 +29,44 @@ local function rng (b, m, r)
   return n
 end
 
+local function auth(options, args)
+  local username = options.apple_id
+  local password = options.apple_id_password
+  local keychain_profile = options.notary_profile
+  if not keychain_profile then
+    assert(username, "--apple-id is required")
+    assert(password, "--apple-id-password is required")
+  end
+
+  if args then
+    if keychain_profile then
+      args[#args + 1] = "--keychain-profile"
+      args[#args + 1] = keychain_profile
+    else
+      if username then
+        args[#args + 1] = "--apple-id"
+        args[#args + 1] = username
+      end
+      if username then
+        args[#args + 1] = "--password"
+        args[#args + 1] = password
+      end
+      if options.asc_provider then
+        args[#args + 1] = "--asc-provider"
+        args[#args + 1] = options.asc_provider
+      end
+    end
+  end
+  return args
+end
+
+
 local function notarize(app_path, options)
   if dotenv.os_name ~= "Darwin" then
     error("Notarization is only supported on macOS")
   end
 
-  local username = options.apple_id
-  local password = options.apple_id_password
-  assert(username, "--apple-id is required")
-  assert(password, "--apple-id-password is required")
+  auth(options)
 
   local has_ticket
   run_with_filter({ "xcrun", "stapler", "staple", app_path }, function (line)
@@ -48,8 +77,7 @@ local function notarize(app_path, options)
     return
   end
 
-  local bundle_id = read_project().title:gsub("[^a-zA-Z0-9]", "") .. ".notarized." .. rng()
-  print("Notarizing app... (ID " .. bundle_id .. ")")
+  print("Notarizing app...")
 
   local zip_path = app_path .. ".notarize.zip"
   zip.create(app_path, zip_path, 1)
@@ -60,21 +88,11 @@ local function notarize(app_path, options)
 
   local request_uuid
   local ok, error_msg = pcall(function ()
-    local args = {
-      "xcrun", "altool",
-      "--notarize-app",
-      "--primary-bundle-id", bundle_id,
-      "--file", zip_path,
-      "--username", username, "--password", password,
-    }
-    if options.asc_provider then
-      args[#args + 1] = "--asc-provider"
-      args[#args + 1] = options.asc_provider
-    end
-
-    run_with_filter(args, function (line)
+    run_with_filter(auth(options, {
+      "xcrun", "notarytool", "submit", "--no-progress", zip_path,
+    }), function (line)
       print(line)
-      request_uuid = request_uuid or line:match("^%s*RequestUUID =%s*([0-9a-zA-Z-]+)")
+      request_uuid = request_uuid or line:match("^%s*id:%s*([0-9a-zA-Z-]+)")
     end)
 
     if not request_uuid then
@@ -97,41 +115,23 @@ local function wait(request_uuid, options)
     return
   end
 
-  local username = options.apple_id
-  local password = options.apple_id_password
-  assert(username, "--apple-id is required")
-  assert(password, "--apple-id-password is required")
+  auth(options)
 
   print("Waiting for notarization to finish...")
 
-  local final_status
-  while true do
-    local status, log_file
-    run_with_filter({
-      "xcrun", "altool",
-      "--notarization-info", request_uuid,
-      "--username", username, "--password", password,
-    }, function (line)
-      status = status or line:match("^%s*Status:%s*(.*)$")
-      log_file = log_file or line:match("^%s*LogFileURL:%s*(.*)$")
-    end)
+  local status
+  run_with_filter(auth(options, {
+    "xcrun", "notarytool", "wait", request_uuid,
+  }), function (line)
+    status = status or line:match("^%s*status:%s*(.*)$")
+  end)
 
-    if status ~= "in progress" then
-      print("Notarization finished with status: " .. (status or "nil"))
-      final_status = status
-      if log_file then
-        print("Log file URL: " .. log_file)
-      end
-      break
-    end
-
-    print("Notarization in progress. Waiting 30s before checking again...")
-    shell.pexecute({"sleep", "30"})
+  if status == "Invalid" then
+    shell.pexecute(auth(options, { "xcrun", "notarytool", "log", request_uuid }))
+    error("Notarization failed")
   end
 
-  if final_status ~= "success" then
-    error("Notarization failed with status " .. final_status)
-  end
+  print(status)
 end
 
 local function staple(app_path)

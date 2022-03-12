@@ -36,6 +36,7 @@ function M.read_project()
 
   local path = require("path")
   local ini = parse_ini(path.join(project_dir, "game.project"))
+  ini.project = ini.project or {}
 
   project = {
     ini = ini,

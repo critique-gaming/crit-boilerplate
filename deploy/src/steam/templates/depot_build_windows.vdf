@@ -1,7 +1,7 @@
 "DepotBuildConfig"
 {
   "DepotID" "${depot_id_windows}"
-  "ContentRoot" "windows/${title}"
+  "ContentRoot" "windows/${title_windows}"
   "FileMapping"
   {
     "LocalPath" "*"

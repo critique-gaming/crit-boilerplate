@@ -6,6 +6,7 @@ local read_project = require("deploy.src.project").read_project
 local dotenv = require("deploy.src.dotenv")
 local api = require("deploy.src.api")
 local inifile = require("inifile")
+local json = require("json")
 
 local set_ini = util.set_ini
 local project_dir = _G.project_dir or "."
@@ -26,8 +27,7 @@ local function edit_game_project(context)
   local options = context.options
   local project = context.project
   local platform = context.platform
-
-  local overrides = {}
+  local overrides = context.overrides
   local ini = project.ini
 
   set_ini(overrides, "crit", "bundled", 1)
@@ -63,7 +63,7 @@ local function edit_game_project(context)
   end
 end
 
-local function write_env_lua()
+local function write_env_lua(context)
   local env_lua_path = path.join(project_dir, "_env", "env.lua")
 
   local original_env_str
@@ -73,7 +73,10 @@ local function write_env_lua()
     env_lua:close()
   end
 
-  local env_str = "return { bundled = true }"
+  local env_object = { bundled = true }
+  api.run_hook("build:env_lua", env_object, context)
+
+  local env_str = "return " .. util.dump(env_object)
   util.write_file(env_lua_path, env_str)
 
   return function ()
@@ -99,7 +102,7 @@ local function run_codesign(item, identity)
   })
 end
 
-local function codesign(platform, output_dir, options)
+local function codesign(platform, output_dir, options, context)
   if platform ~= "mac" or not options.mac_identity then
     return
   end
@@ -109,7 +112,7 @@ local function codesign(platform, output_dir, options)
     error("Code signing macOS builds can only be done on macOS")
   end
 
-  local project_title = read_project().title
+  local project_title = context.title
   local app_path = path.join(output_dir, project_title .. ".app")
   local identity = options.mac_identity
 
@@ -147,7 +150,6 @@ local function build(platform, output_dir, options)
   path.mkdir(output_dir)
 
   local resolved_versions = resolve_versions(options)
-  util.write_file(path.join(output_dir, "VERSION.txt"), resolved_versions.full_version)
 
   local project = read_project()
   local context = {
@@ -156,11 +158,12 @@ local function build(platform, output_dir, options)
     versions = resolved_versions,
     platform = platform,
     output_dir = output_dir,
+    overrides = {},
     overrides_file = path.join(output_dir, "deploy_overrides.ini"),
   }
 
   local restore_game_project = edit_game_project(context)
-  local restore_env_lua = write_env_lua()
+  local restore_env_lua = write_env_lua(context)
   local to_cleanup = api.run_hook("build:prepare", context)
   local passfile
 
@@ -257,6 +260,20 @@ local function build(platform, output_dir, options)
   table.insert(bob_args, "--settings")
   table.insert(bob_args, context.overrides_file)
 
+  local manifest_private_key = path.join(project_dir, "deploy", "config", "manifests", "manifest.private.der")
+  if path.isfile(manifest_private_key) then
+    table.insert(bob_args, "--manifest-private-key")
+    table.insert(bob_args, manifest_private_key)
+  end
+
+  local manifest_public_key = path.join(project_dir, "deploy", "config", "manifests", "manifest.public.der")
+  if path.isfile(manifest_public_key) then
+    table.insert(bob_args, "--manifest-public-key")
+    table.insert(bob_args, manifest_public_key)
+  end
+
+  table.insert(bob_args, "--archive-resource-padding")
+  table.insert(bob_args, "16")
 
   local ok, error_msg = pcall(function ()
     api.run_hook("build:bob_args", bob_args, context)
@@ -265,7 +282,7 @@ local function build(platform, output_dir, options)
 
   if not ok then
     pcall(function ()
-      path.each(path.join(project_dir, "build", "*"), function (fname, ...)
+      path.each(path.join(project_dir, "build", "*"), function (fname)
         local log_fname = path.join(fname, "log.txt")
         local ok_, log_data = pcall(function ()
           return util.read_file(log_fname)
@@ -284,16 +301,31 @@ local function build(platform, output_dir, options)
 
   restore()
 
+  context.title = (context.overrides.project and context.overrides.project.title)
+    or (context.project.ini.project and context.project.ini.project.title)
+    or "Unnamed"
+
+  context.exe_name = context.title:gsub("[^a-zA-Z0-9_]", "")
+
+  util.write_file(path.join(output_dir, "BUILD.json"), json.encode({
+    title = context.title,
+    exe_name = context.exe_name,
+    version = resolved_versions.full_version,
+    variant = variant,
+  }))
+
   if platform == "windows" then
     pcall(function ()
       path.rename(
-        path.join(output_dir, project.title, "dmengine.pdb"),
+        path.join(output_dir, context.title, "dmengine.pdb"),
         path.join(output_dir, "dmengine.pdb")
       )
     end)
   end
 
-  codesign(platform, output_dir, options)
+  codesign(platform, output_dir, options, context)
+
+  return context
 end
 
 return build

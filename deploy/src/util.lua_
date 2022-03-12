@@ -44,6 +44,22 @@ local function set_ini(ini, category, key, value)
   ini[category][key] = value
 end
 
+-- Try to make path relative to project dir, so that path hashes are kept stable
+local function relativise_path(filename, relative_to)
+  local path = require("path")
+  filename = path.normalize(path.abspath(filename))
+
+  local relative_to_abs = path.normalize(path.abspath(relative_to or _G.project_dir or "."))
+  local pwd = path.ensure_dir_end(relative_to_abs)
+
+  if filename:sub(1, #pwd) == pwd then
+    filename = filename:sub(#pwd + 1)
+  end
+
+  return filename
+end
+
+
 local function add_settings_file(bob_args, filename, debug)
   local path = require("path")
   local fpath = path.join(_G.project_dir or ".", "deploy", "config", "project_properties", filename)
@@ -90,6 +106,42 @@ local function split(s, pattern)
   end)
 end
 
+local dump
+local function format_key(x)
+  if type(x) == "string" and string.match(x, "^[_a-zA-Z][_0-9a-zA-Z]*$") then
+    return x
+  end
+  return "[" .. dump(x) .. "]"
+end
+
+function dump(x, identation)
+  identation = identation or ""
+  local tp = type(x)
+  if tp == "table" then
+    local ident = identation .. "  "
+    local s = "{"
+    local n = #x
+    for i = 1, n do
+      s = s .. "\n" .. ident .. dump(x[i], ident) .. ","
+    end
+    for k, v in pairs(x) do
+      if type(k) ~= "number" or k < 1 or k > n then
+        s = s .. "\n" .. ident .. format_key(k) .. " = " .. dump(v, ident) .. ","
+      end
+    end
+    if s == "{" then
+      s = "{}"
+    else
+      s = s .. "\n" .. identation .. "}"
+    end
+    return s
+  elseif tp == "string" then
+    return string.format("%q", x)
+  else
+    return tostring(x)
+  end
+end
+
 return {
   read_file = read_file,
   write_file = write_file,
@@ -99,4 +151,6 @@ return {
   add_settings_file = add_settings_file,
   rmdir = rmdir,
   split = split,
+  relativise_path = relativise_path,
+  dump = dump,
 }

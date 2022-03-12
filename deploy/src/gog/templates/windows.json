@@ -4,8 +4,8 @@
         "clientId": "${client_id}",
         "clientSecret": "${client_secret}",
         "version": "${full_version}",
-        "installDirectory": "${title}",
-        "name": "${title}",
+        "installDirectory": "${title_windows}",
+        "name": "${title_windows}",
         "platform": "windows",
         "tags": [
             "editor_v_1_4_0"
@@ -13,12 +13,12 @@
         "languageMode": "together",
         "products": [
             {
-                "name": "${title}",
+                "name": "${title_windows}",
                 "productId": "${product_id}",
                 "depots": [
                     {
                         "name": "main",
-                        "folder": "${build_dir}/windows/${title}",
+                        "folder": "${build_dir}/windows/${title_windows}",
                         "languages": [
                             "en-US"
                         ],
@@ -30,12 +30,12 @@
                 "tasks": [
                     {
                         "type": "FileTask",
-                        "name": "${title}",
+                        "name": "${title_windows}",
                         "languages": [
                             "en-US"
                         ],
                         "category": "game",
-                        "path": "${title}.exe",
+                        "path": "${exe_name_windows}.exe",
                         "isPrimary": true,
                         "osBitness": [
                             "64"

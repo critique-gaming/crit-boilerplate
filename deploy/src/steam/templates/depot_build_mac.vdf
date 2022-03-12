@@ -11,10 +11,10 @@
   "FileExclusion" ".DS_Store"
   "FileExclusion" "thumbs.db"
   "FileExclusion" "Thumbs.db"
-  "FileExclusion" "${title}.dSYM*"
+  "FileExclusion" "${title_mac}.dSYM*"
   "FileProperties"
   {
-    "LocalPath" "${title}.app/Contents/MacOS/${title}"
+    "LocalPath" "${title_mac}.app/Contents/MacOS/${exe_name_mac}"
     "Attributes" "executable"
   }
 }

@@ -5,6 +5,7 @@ local notarize = require("deploy.src.notarize")
 local dotenv = require("deploy.src.dotenv")
 local util = require("deploy.src.util")
 local api = require("deploy.src.api")
+local json = require("json")
 
 local function gog_upload(branch, platforms, build_dir, options)
   print("Building for GOG branch \"" .. branch .. "\"...")
@@ -17,7 +18,7 @@ local function gog_upload(branch, platforms, build_dir, options)
   local branch_config = config.branches[branch]
   assert(branch_config, "No such GOG branch defined in config: " .. branch)
 
-  local build_options = util.deep_clone(branch.build_options)
+  local build_options = util.deep_clone(branch_config.build_options)
   build_options.mac_identity = options.mac_identity
 
   path.mkdir(build_dir)
@@ -37,10 +38,10 @@ local function gog_upload(branch, platforms, build_dir, options)
     local mac_app_path, notarization_request_uuid
     for _, platform in ipairs(platforms) do
       local build_output = path.join(build_dir, platform)
-      build(platform, build_output, build_options)
+      local build_context = build(platform, build_output, build_options)
 
       if platform == "mac" and not options.skip_notarize and options.apple_id and options.apple_id_password then
-        mac_app_path = path.join(build_output, template_args.title .. ".app")
+        mac_app_path = path.join(build_output, build_context.title .. ".app")
         notarization_request_uuid = notarize.notarize(mac_app_path, options)
       end
     end
@@ -51,12 +52,19 @@ local function gog_upload(branch, platforms, build_dir, options)
     end
   end
 
+  for _, platform in ipairs(platforms) do
+    local build_output = path.join(build_dir, platform)
+    local build_context = json.decode(util.read_file(path.join(build_output, 'BUILD.json')))
+    template_args["title_" .. platform] = build_context.title
+    template_args["exe_name_" .. platform] = build_context.exe_name
+  end
+
   print("Uploading to GOG.com branch \"" .. branch .. "\"...")
   for _, platform in ipairs(platforms) do
     local project_dir = _G.project_dir or "."
     local project_path = path.join(build_dir, platform .. ".json")
     util.template(
-      path.join(project_dir, "deploy", "src", "gog", "products", build_options.gog_product, platform .. ".json"),
+      path.join(project_dir, "deploy", "src", "gog", "templates", platform .. ".json"),
       project_path,
       template_args
     )
@@ -89,11 +97,11 @@ local function with_hooks(f)
     end)
 
     api.register_hook("build:bob_args", function (bob_args, context)
-      util.add_settings_file(bob_args, "gog", context.option.debug)
+      util.add_settings_file(bob_args, "gog", context.options.debug)
     end)
 
     api.register_hook("build:game_project", function (overrides, context)
-      util.set_init(overrides, "crit", "gog", 1)
+      util.set_ini(overrides, "crit", "gog", 1)
     end)
 
     f()

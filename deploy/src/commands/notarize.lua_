@@ -4,6 +4,7 @@ M.id = "cmd_notarize"
 
 function M.arg_config(cmd)
   local dotenv = require("deploy.src.dotenv")
+  cmd:option("--notary-profile", "macOS notarization keychain profile made with xcrun notarytool store-credentials", dotenv.getenv("NOTARY_PROFILE"))
   cmd:option("--apple-id", "Apple ID username", dotenv.getenv("APPLE_ID"))
   cmd:option("--apple-id-password", "Apple ID password", dotenv.getenv("APPLE_ID_PASSWORD")):show_default(false)
   cmd:option("--asc-provider", "Your short Apple Developer Account team ID", dotenv.getenv("ASC_PROVIDER"))
@@ -27,8 +28,12 @@ function M.run(args)
 
   local app_path = args.app_path
   if not app_path then
-    local read_project = require("deploy.src.project").read_project
-    app_path = path.join(_G.project_dir or ".", "dist", "build", "mac", read_project().title .. ".app")
+    local util = require("deploy.src.util")
+    local json = require("json")
+
+    local out_dir = path.join(_G.project_dir or ".", "dist", "build", "mac")
+    local project_title = json.decode(util.read_file(path.join(out_dir, 'BUILD.json'))).title
+    app_path = path.join(out_dir, project_title .. ".app")
   end
 
   if not args.just_staple then

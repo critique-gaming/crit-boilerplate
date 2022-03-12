@@ -1,7 +1,7 @@
 "DepotBuildConfig"
 {
   "DepotID" "${depot_id_linux}"
-  "ContentRoot" "linux/${title}"
+  "ContentRoot" "linux/${title_linux}"
   "FileMapping"
   {
     "LocalPath" "*"
@@ -13,7 +13,7 @@
   "FileExclusion" "Thumbs.db"
   "FileProperties"
   {
-    "LocalPath" "${title}.x86_64"
+    "LocalPath" "${exe_name_linux}.x86_64"
     "Attributes" "executable"
   }
 }
