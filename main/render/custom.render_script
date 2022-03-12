@@ -27,19 +27,19 @@ local function configure_layout(self)
     end
   end
 
-  local projection_height = Layout.design_height
-  local projection_width = viewport_width * projection_height / viewport_height
-  local projection_left = (Layout.design_width - projection_width) * 0.5
+  local camera_height = Layout.design_height
+  local camera_width = viewport_width * camera_height / viewport_height
+  local camera_left = (Layout.design_width - camera_width) * 0.5
 
   Layout.set_metrics({
     window_width = window_width,
     window_height = window_height,
     viewport_width = viewport_width,
     viewport_height = viewport_height,
-    projection_left = projection_left,
-    projection_bottom = 0,
-    projection_right = projection_left + projection_width,
-    projection_top = projection_height,
+    camera_left = camera_left,
+    camera_bottom = 0,
+    camera_right = camera_left + camera_width,
+    camera_top = camera_height,
   })
 
   transitions.window_resized(Layout.viewport_width, Layout.viewport_height);
