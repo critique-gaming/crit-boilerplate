@@ -6,6 +6,10 @@ local game = require "main.progression.game"
 
 local h_run_progression = hash("run_progression")
 
+-- Define your progressions here. They are coroutines which optionally recieve an argument.
+-- By default the `main` coroutine is ran, unless overriden by `env.entry_progression`.
+-- To cancel the currently running progression and start a new one, do
+-- `dispatcher.dispatch(h_run_progression, { id = "my_progression", options = "the_optional_arg" })`
 local progressions = {
   main = function ()
     if env.entry_screen then
@@ -15,6 +19,8 @@ local progressions = {
 
     game()
   end,
+
+  game = game,
 }
 
 local function run_progression(progression_id, ...)
