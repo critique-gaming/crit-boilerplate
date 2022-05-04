@@ -16,7 +16,7 @@ local platforms = {
   linux = "x86_64-linux",
   windows = "x86_64-win32",
   android = "armv7-android",
-  ios = "armv7-darwin",
+  ios = "arm64-darwin",
   web = "js-web",
   switch = "arm64-nx64",
 }
