@@ -16,3 +16,4 @@ luacov.report.out
 doc
 .deploy_env
 /dist
+imgui.ini

@@ -1,0 +1,9 @@
+local sys_config = require "crit.sys_config"
+
+go.property("enabled", true)
+
+function init(self)
+  if self.enabled and sys_config.debug then
+    collectionfactory.create("#collectionfactory")
+  end
+end

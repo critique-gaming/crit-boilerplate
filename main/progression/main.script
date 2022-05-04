@@ -35,12 +35,18 @@ local function run_progression(progression_id, ...)
 end
 
 local function entry_point()
-  local co = run_progression(env.entry_progression or "main", env.entry_progression_arg)
-  while true do
-    local message = progression.wait_for_message(h_run_progression)
-    progression.cancel(co)
-    co = run_progression(message.id, message.options)
-  end
+  local co
+
+  local watcher = progression.fork(function ()
+    while true do
+      local message = progression.wait_for_message(h_run_progression)
+      if co then progression.cancel(co) end
+      co = run_progression(message.id, message.options)
+    end
+  end)
+
+  co = run_progression(env.entry_progression or "main", env.entry_progression_arg)
+  progression.join(watcher)
 end
 
 progression.init_register_function(entry_point)

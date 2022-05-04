@@ -1,0 +1,38 @@
+local dispatcher = require "crit.dispatcher"
+local Layout = require "crit.layout"
+local debug_overlay = require "main.debug.debug_overlay"
+
+local h_window_change_size = hash("window_change_size")
+local h_toggle_debug_overlay = hash("toggle_debug_overlay")
+
+function init(self)
+  imgui.set_global_font_scale(2)
+  imgui.set_display_size(Layout.viewport_width, Layout.viewport_height)
+
+  self.sub_id = dispatcher.subscribe({ h_window_change_size, h_toggle_debug_overlay })
+end
+
+function final(self)
+  dispatcher.unsubscribe()
+end
+
+function on_message(self, message_id, message, sender)
+  if message_id == h_window_change_size then
+    imgui.set_display_size(Layout.viewport_width, Layout.viewport_height)
+  elseif message_id == h_toggle_debug_overlay then
+    debug_overlay.enabled = not debug_overlay.enabled
+    if debug_overlay.enabled then
+      msg.post(".", "acquire_input_focus")
+      msg.post("imgui_input#imgui", "acquire_input_focus")
+      msg.post("main:/global_bindings#global_bindings", "acquire_input_focus")
+    else
+      msg.post(".", "release_input_focus")
+    end
+  end
+end
+
+function on_input(self, action_id, action)
+  if debug_overlay.enabled and debug_overlay.block_input then
+    return true
+  end
+end

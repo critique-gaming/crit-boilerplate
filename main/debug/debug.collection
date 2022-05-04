@@ -1,30 +1,10 @@
-name: "main"
-instances {
-  id: "debug"
-  prototype: "/main/debug/debug.go"
-  position {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 1.0
-  }
-  scale3 {
-    x: 1.0
-    y: 1.0
-    z: 1.0
-  }
-}
+name: "default"
 scale_along_z: 0
 embedded_instances {
-  id: "scripts"
+  id: "debug_hub"
   data: "components {\n"
-  "  id: \"main\"\n"
-  "  component: \"/main/main.script\"\n"
+  "  id: \"debug_hub\"\n"
+  "  component: \"/main/debug/debug_hub.script\"\n"
   "  position {\n"
   "    x: 0.0\n"
   "    y: 0.0\n"
@@ -56,28 +36,10 @@ embedded_instances {
   }
 }
 embedded_instances {
-  id: "screens"
+  id: "imgui"
   data: "components {\n"
-  "  id: \"screens_proxy\"\n"
-  "  component: \"/main/screens_proxy.script\"\n"
-  "  position {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "  }\n"
-  "  rotation {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "    w: 1.0\n"
-  "  }\n"
-  "}\n"
-  "embedded_components {\n"
-  "  id: \"screens\"\n"
-  "  type: \"collectionproxy\"\n"
-  "  data: \"collection: \\\"/main/screens.collection\\\"\\n"
-  "exclude: false\\n"
-  "\"\n"
+  "  id: \"script\"\n"
+  "  component: \"/main/debug/debug_imgui.script\"\n"
   "  position {\n"
   "    x: 0.0\n"
   "    y: 0.0\n"
@@ -109,10 +71,45 @@ embedded_instances {
   }
 }
 embedded_instances {
-  id: "global_bindings"
+  id: "imgui_input"
   data: "components {\n"
-  "  id: \"global_bindings\"\n"
-  "  component: \"/main/input/global_bindings.script\"\n"
+  "  id: \"imgui\"\n"
+  "  component: \"/imgui/imgui.script\"\n"
+  "  position {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  ""
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale3 {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+  }
+}
+embedded_instances {
+  id: "debug_dispatcher"
+  data: "components {\n"
+  "  id: \"debug_dispatcher\"\n"
+  "  component: \"/main/debug/debug_dispatcher.script\"\n"
   "  position {\n"
   "    x: 0.0\n"
   "    y: 0.0\n"

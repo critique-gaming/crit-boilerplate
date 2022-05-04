@@ -1,0 +1,67 @@
+local debug_overlay = require "main.debug.debug_overlay"
+local dispatcher = require "crit.dispatcher"
+local env = require "crit.env"
+local save_file = require "crit.save_file"
+
+local function set_time_step(self, value)
+  self.time_step = value
+  msg.post("main:/screens#screens", "set_time_step", { factor = self.time_step, mode = 0 })
+end
+
+function init(self)
+  self.time_step = 1
+  self.swap_interval = 1
+  if env.time_step then
+    set_time_step(self, env.time_step)
+  end
+end
+
+function update(self, dt)
+  if not debug_overlay.enabled then
+    return
+  end
+
+  local changed, value
+
+  imgui.begin_window("Debug controls")
+
+  changed, value = imgui.checkbox("Block game input on this overlay", debug_overlay.block_input)
+  if changed then debug_overlay.block_input = value end
+
+  changed, value = imgui.input_float("time_step", self.time_step, 0.1, 0.1, 1)
+  if changed then
+    set_time_step(self, value)
+  end
+
+  changed, value = imgui.input_int("vsync_swap_interval", self.swap_interval)
+  if changed then
+    self.swap_interval = math.max(value, 0)
+    sys.set_vsync_swap_interval(self.swap_interval)
+  end
+
+  imgui.separator()
+
+  if imgui.button("Clear save file") then
+    save_file.get_current_profile().save({})
+    dispatcher.dispatch("run_progression", { id = env.entry_progression or "main" })
+  end
+
+  if imgui.button("Profiler") then
+    msg.post("@system:", "toggle_profile")
+  end
+
+  if imgui.button("Physics debugger") then
+    msg.post("@system:", "toggle_physics_debug")
+  end
+
+  if imgui.button("Debug misc key") then
+    dispatcher.dispatch("debug_misc_key")
+  end
+
+  if imgui.button("Close overlay") then
+    dispatcher.dispatch("toggle_debug_overlay")
+  end
+
+  imgui.end_window()
+
+end

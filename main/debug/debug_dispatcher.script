@@ -1,0 +1,226 @@
+local debug_overlay = require "main.debug.debug_overlay"
+local dispatcher = require "crit.dispatcher"
+local env = require "crit.env"
+
+local function add_sub(self, message_id)
+  local message_id_hash = hash(message_id)
+  if message_id == "" or self.subscriptions[message_id_hash] then
+    return
+  end
+  self.subscriptions[message_id_hash] = {
+    message_id = message_id,
+    message_id_hash = message_id_hash,
+    sub_id = dispatcher.subscribe({ hash(message_id) }),
+    visible = true,
+  }
+end
+
+local function remove_sub(self, message_id)
+  local message_id_hash = hash(message_id)
+  local sub = self.subscriptions[message_id_hash]
+  if not sub then return end
+  dispatcher.unsubscribe(sub.sub_id)
+  self.subscriptions[message_id_hash] = nil
+end
+
+function init(self)
+  self.print = true
+  self.subscriptions = {}
+  self.messages = {}
+
+  self.input_add_message = ""
+  self.input_message = "{}"
+  self.send_delay = 0
+
+  if env.debug_messages then
+    for _, message_id in ipairs(env.debug_messages) do
+      add_sub(self, message_id)
+    end
+  end
+end
+
+function final(self)
+  for _, sub in pairs(self.subscriptions) do
+    dispatcher.unsubscribe(sub.sub_id)
+  end
+end
+
+function on_message(self, message_id, message, sender)
+  local sub = self.subscriptions[message_id]
+  if not sub then return end
+  self.messages[#self.messages + 1] = {
+    message_id = message_id,
+    message = message,
+    sender = sender,
+  }
+  if self.print and sub.visible then
+    print("Message " .. sub.message_id .. " from " .. tostring(sender) .. ":")
+    pprint(message)
+  end
+end
+
+local table_state = {}
+setmetatable(table_state, { __mode = "k" })
+
+local function update_value(value, key)
+  local text = tostring(value)
+  if key ~= nil then
+    if type(key) ~= "string" then
+      key = "[" .. tostring(key) .. "]"
+    end
+    text = key .. " = " .. text
+  end
+
+  if type(value) == "table" then
+    local visible = table_state[value]
+    local changed, new_value = imgui.checkbox(text, visible)
+    if changed then
+      table_state[value] = new_value
+      visible = new_value
+    end
+
+    if visible then
+      for i = 1, #value do
+        imgui.indent()
+        update_value(value[i])
+        imgui.unindent()
+      end
+      for k, v in pairs(value) do
+        if type(k) ~= "number" or k < 1 or k > #value then
+          imgui.indent()
+          update_value(v, k)
+          imgui.unindent()
+        end
+      end
+    end
+  else
+    imgui.text(text)
+  end
+end
+
+function update(self, dt)
+  if not debug_overlay.enabled then
+    return
+  end
+
+  local changed, value
+
+  imgui.begin_window("Dispatcher logging")
+
+  changed, value = imgui.checkbox("Print to console", self.print)
+  if changed then self.print = value end
+
+  if imgui.begin_table("Add message input", 3) then
+    imgui.table_next_row()
+
+    imgui.table_next_column()
+    changed, value = imgui.input_text("", self.input_add_message)
+    if changed then self.input_add_message = value end
+
+    imgui.table_next_column()
+    if imgui.button("Subscribe to message") then
+      add_sub(self, self.input_add_message)
+      self.input_add_message = ""
+    end
+
+    imgui.table_next_column()
+    if imgui.button("Send message") then
+      local send_message = function ()
+        local ok, err = pcall(function ()
+          local input = self.input_message
+          if input == "" then
+            input = "{}"
+          end
+          local chunk = assert(loadstring("return (" .. input .. ")"))
+          dispatcher.dispatch(self.input_add_message, chunk())
+        end)
+        if not ok then
+          print(err)
+        end
+      end
+      if self.send_delay == 0 then
+        send_message()
+      else
+        timer.delay(self.send_delay, false, send_message)
+      end
+    end
+    imgui.end_table()
+  end
+
+  if imgui.begin_table("Send message", 2) then
+    imgui.table_next_row()
+
+    imgui.table_next_column()
+    changed, value = imgui.input_text("Message payload", self.input_message)
+    if changed then self.input_message = value end
+
+    imgui.table_next_column()
+    changed, value = imgui.input_float("Delay", self.send_delay)
+    if changed then self.send_delay = value end
+
+    imgui.end_table()
+  end
+
+  if imgui.button("Clear log") then
+    self.messages = {}
+  end
+
+  imgui.separator()
+  if imgui.begin_table("Subscriptions", 2) then
+    for _, sub in pairs(self.subscriptions) do
+      imgui.push_id(sub.message_id)
+      imgui.table_next_row()
+      imgui.table_next_column()
+      imgui.push_id("visible")
+      changed, value = imgui.checkbox(sub.message_id, sub.visible)
+      if changed then
+        sub.visible = value
+      end
+      imgui.pop_id()
+
+      imgui.table_next_column()
+      if imgui.button("Unsub") then
+        remove_sub(self, sub.message_id)
+      end
+      imgui.pop_id()
+    end
+    imgui.end_table()
+  end
+
+  imgui.separator()
+
+  if imgui.begin_table("Messages", 3, bit.bor(imgui.TABLE_RESIZABLE, imgui.TABLE_SCROLLY, imgui.TABLE_HIDEABLE)) then
+    imgui.table_setup_column("message_id")
+    imgui.table_setup_column("message")
+    imgui.table_setup_column("sender")
+    imgui.table_headers_row()
+
+    for i = #self.messages, 1, -1 do
+      local message = self.messages[i]
+      local sub = self.subscriptions[message.message_id]
+      if sub and sub.visible then
+        imgui.push_id("message_" .. i)
+        imgui.table_next_row()
+        imgui.table_next_column()
+        imgui.text(sub.message_id)
+        imgui.table_next_column()
+        update_value(message.message)
+        imgui.table_next_column()
+        imgui.text(tostring(message.sender))
+        imgui.pop_id()
+
+        imgui.table_next_row()
+        imgui.table_next_column()
+        imgui.separator()
+        imgui.table_next_column()
+        imgui.separator()
+        imgui.table_next_column()
+        imgui.separator()
+      end
+    end
+
+    imgui.end_table()
+  end
+
+  imgui.end_window()
+end

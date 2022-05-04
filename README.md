@@ -17,7 +17,8 @@ Ready-to-use starter project based on [Crit], [Monarch] and [DefOS].
 * Set-up input method switching (`crit.input_state`)
 * Common global keybindings already set-up
 * Quickly check which keys are being held down with the `held_keys` table
-* Save profile management
+* Save profile management with `crit.save_file`
+* Debug overlay with [ImGUI]
 * Testing and code coverage with [DefTest], [Codecov] and Github Actions.
 * LDoc-ready documentation. Use the provided GitHub Actions workflow to 
 [publish it to GitHub Pages](https://critique-gaming.github.io/crit-boilerplate)
@@ -26,11 +27,13 @@ other bells and whistles
 
 [DefTest]: https://github.com/britzl/deftest
 [Codecov]: https://codecov.io
+[ImGUI]: https://github.com/britzl/extension-imgui
 
 ## Global key bindings
 
 * `Alt + F4` (Windows and Linux only): Quit the game
 * `Alt + Enter` or `F11`: Toggle full screen
+* `Backquote` (Debug builds only): Toggle debug overlay
 * `Ctrl + Backquote` (Debug builds only): Toggle profiler
 * `Ctrl + P` (Debug builds only): Toggle physics debugger
 
