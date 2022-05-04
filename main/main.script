@@ -60,6 +60,6 @@ end
 
 function update(self, dt)
   if defos then
-    save_file.set_config("full_screen", defos.is_fullscreen())
+    save_file.config.full_screen = defos.is_fullscreen()
   end
 end
