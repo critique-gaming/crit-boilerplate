@@ -29,6 +29,23 @@ other bells and whistles
 [Codecov]: https://codecov.io
 [ImGUI]: https://github.com/britzl/extension-imgui
 
+## Getting started
+
+At load time, the `main` progression is run, which loads the `game` screen in `screens/game/game.collection`.
+
+Crit [progressions](https://critique-gaming.github.io/crit/modules/crit.progression.html) are coroutines that 
+coreograph the top-level flow of the game, like the order of the scenes or the lines of dialogue being spoken
+by characters. See `main/progression/main.script` to learn how they work and define your own progressions.
+
+We generally use a pub-sub architecture with a singleton [dispatcher](https://critique-gaming.github.io/crit/modules/crit.dispatcher.html) (`crit.dispatcher`). You send messages to the dispatcher (`dispatcher.dispatch()`). Scripts subscribe to it (`dispatcher.subscribe()`/`dispatcher.unsubscribe()`) and they receive them in their `on_message` function.
+See `main/debug/debug_imgui.script`) for an example.
+
+## The debug overlay
+
+Press the Backquote/Tilda key (`~`) to open the debug overlay. This is a collection of mini-UIs written in ImGUI. 
+See `main/debug/debug_hub.script` for an example. If you need a new one, make a script for it, add it to 
+`debug.collection` and you're good to go.
+
 ## Global key bindings
 
 * `Alt + F4` (Windows and Linux only): Quit the game
